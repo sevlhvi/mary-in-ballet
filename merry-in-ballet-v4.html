@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mary in Ballet · Studio OS</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;600&family=Lato:wght@300;400;700&display=swap');
+
+:root{
+  --bg:#f0ebe6;
+  --bg2:#ebe4de;
+  --surf:#ffffff;
+  --surf2:#faf6f2;
+  --surf3:#f5efe8;
+  --ink:#1a1410;
+  --ink2:#3d3028;
+  --ink3:#6b5a52;
+  --muted:#9c8c84;
+  --dust:#c4b5ad;
+  --bdr:rgba(175,150,140,.18);
+  --bdr2:rgba(175,150,140,.35);
+
+  --rose:#bf6348;
+  --rose2:#a5503a;
+  --roseL:#f5e8e2;
+  --roseLL:#fdf5f2;
+  --gold:#c9a456;
+  --goldL:#f5eddb;
+  --sage:#6e9677;
+  --sageL:#e2f0e6;
+  --sky:#6a96b8;
+  --skyL:#deedf8;
+  --warn:#c87e42;
+  --warnL:#faebd4;
+  --red:#c04848;
+  --redL:#fde8e8;
+
+  --sh:0 1px 8px rgba(26,20,16,.06), 0 2px 16px rgba(26,20,16,.04);
+  --sh2:0 4px 24px rgba(26,20,16,.10), 0 1px 4px rgba(26,20,16,.06);
+  --sh3:0 12px 48px rgba(26,20,16,.16), 0 2px 8px rgba(26,20,16,.08);
+  --r:7px;--r2:12px;--r3:20px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13.5px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);height:100vh;overflow:hidden;display:flex}
+
+/* ── SIDEBAR ──────────────────────────── */
+#sb{
+  width:220px;flex-shrink:0;
+  background:linear-gradient(180deg,#1c1714 0%,#181310 100%);
+  display:flex;flex-direction:column;height:100vh;overflow-y:auto;
+  border-right:1px solid rgba(255,255,255,.04);
+}
+#sb::after{
+  content:'';position:fixed;left:0;top:0;width:220px;height:100vh;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,164,86,.08) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+.sb-logo{padding:26px 20px 20px;border-bottom:1px solid rgba(255,255,255,.06);position:relative;z-index:1}
+.sb-logo-en{
+  font-family:'Gowun Batang',serif;
+  color:var(--gold);font-size:17px;letter-spacing:.08em;line-height:1.2;
+}
+.sb-logo-ko{font-size:8.5px;color:rgba(255,255,255,.18);letter-spacing:.22em;margin-top:4px;text-transform:uppercase}
+.sb-sec{
+  padding:16px 20px 3px;font-size:8px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.14);position:relative;z-index:1;
+}
+.sb-a{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 20px;color:rgba(255,255,255,.35);
+  font-size:12px;cursor:pointer;
+  border-left:2px solid transparent;
+  transition:all .15s ease;user-select:none;position:relative;z-index:1;
+}
+.sb-a:hover{color:rgba(255,255,255,.72);background:rgba(255,255,255,.04)}
+.sb-a.on{
+  color:var(--gold);border-left-color:var(--gold);
+  background:linear-gradient(90deg,rgba(201,164,86,.12) 0%,transparent 100%);
+}
+.sb-a .ico{font-size:12px;width:16px;text-align:center;flex-shrink:0;opacity:.8}
+.sb-badge{
+  margin-left:auto;padding:1px 6px;border-radius:20px;
+  font-size:9px;font-weight:700;min-width:18px;text-align:center;
+  font-family:'Lato',sans-serif;
+}
+.sb-badge.r{background:var(--rose);color:#fff}
+.sb-badge.g{background:var(--sage);color:#fff}
+.sb-badge.w{background:var(--warn);color:#fff}
+.sb-badge.gr{background:rgba(255,255,255,.12);color:rgba(255,255,255,.45)}
+.sb-today{
+  margin:12px 12px 4px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:var(--r2);padding:12px 14px;
+  position:relative;z-index:1;
+}
+.sb-today-lbl{
+  font-size:8px;color:rgba(255,255,255,.18);
+  letter-spacing:.18em;text-transform:uppercase;margin-bottom:7px;
+}
+.sb-today-item{
+  font-size:10.5px;color:rgba(255,255,255,.38);
+  padding:2.5px 0;display:flex;gap:6px;align-items:center;
+}
+.sb-today-item .dot{width:5px;height:5px;border-radius:50%;background:var(--rose);flex-shrink:0}
+.sb-today-item .dot.g{background:var(--sage)}
+.sb-foot{
+  margin-top:auto;padding:14px 20px;
+  border-top:1px solid rgba(255,255,255,.05);
+  font-size:10px;color:rgba(255,255,255,.15);line-height:1.9;
+  position:relative;z-index:1;
+}
+
+/* ── MAIN ─────────────────────────────── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#topbar{
+  background:var(--surf);
+  border-bottom:1px solid var(--bdr);
+  height:54px;flex-shrink:0;
+  display:flex;align-items:center;padding:0 24px;gap:10px;
+  box-shadow:0 1px 0 rgba(175,150,140,.1);
+}
+.tb-title{
+  font-family:'Gowun Batang',serif;
+  font-size:17px;color:var(--ink);flex:1;
+  letter-spacing:.02em;
+}
+.search-wrap{
+  display:flex;align-items:center;gap:7px;
+  background:var(--surf2);border:1px solid var(--bdr2);
+  border-radius:var(--r);padding:0 12px;width:220px;
+  transition:all .15s ease;
+}
+.search-wrap:focus-within{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px rgba(191,99,72,.1);
+  background:var(--surf);
+}
+.search-wrap input{
+  border:none;background:transparent;outline:none;
+  font-size:12px;font-family:inherit;color:var(--ink);
+  padding:7px 0;width:100%;
+}
+.search-wrap input::placeholder{color:var(--dust)}
+
+/* ── BUTTONS ─────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 15px;border-radius:var(--r);
+  font-size:11.5px;font-family:inherit;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s ease;white-space:nowrap;
+  letter-spacing:.01em;
+}
+.bp{background:var(--rose);color:#fff;box-shadow:0 1px 4px rgba(191,99,72,.3)}
+.bp:hover{background:var(--rose2);box-shadow:0 2px 8px rgba(191,99,72,.4);transform:translateY(-1px)}
+.bp:active{transform:translateY(0)}
+.bo{background:transparent;color:var(--ink2);border:1px solid var(--bdr2)}
+.bo:hover{background:var(--surf2);border-color:var(--rose);color:var(--rose)}
+.bg{background:var(--gold);color:#fff;box-shadow:0 1px 4px rgba(201,164,86,.3)}
+.bg:hover{background:#b08a3c;transform:translateY(-1px)}
+.bw{background:var(--warn);color:#fff}.bw:hover{background:#a86230;transform:translateY(-1px)}
+.bs{padding:4px 11px;font-size:11px}
+
+/* ── CONTENT ─────────────────────────── */
+#content{flex:1;overflow-y:auto;padding:22px 24px}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:2px}
+
+.page{display:none}
+.page.on{display:block;animation:fadeUp .2s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ───────────────────────────── */
+.card{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;
+}
+.ch{
+  padding:14px 20px;border-bottom:1px solid var(--bdr);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:linear-gradient(180deg,var(--surf) 0%,var(--surf2) 100%);
+}
+.ct{font-family:'Gowun Batang',serif;font-size:15px;font-weight:400;color:var(--ink);letter-spacing:.01em}
+.cb{padding:16px 20px}
+
+/* ── STAT TILES ──────────────────────── */
+.stat-grid{display:grid;gap:12px;margin-bottom:18px}
+.stat-grid.c4{grid-template-columns:repeat(4,1fr)}
+.stat-grid.c5{grid-template-columns:repeat(5,1fr)}
+.stat-grid.c3{grid-template-columns:repeat(3,1fr)}
+.stat-tile{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:var(--r2);padding:16px 16px 13px;
+  box-shadow:var(--sh);position:relative;overflow:hidden;
+  transition:transform .15s ease,box-shadow .15s ease;
+}
+.stat-tile:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
+.stat-tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px}
+.stat-tile::after{
+  content:'';position:absolute;right:-20px;top:-20px;
+  width:80px;height:80px;border-radius:50%;opacity:.05;
+}
+.st-rose::before{background:linear-gradient(180deg,var(--rose),var(--rose2))}
+.st-rose::after{background:var(--rose)}
+.st-gold::before{background:linear-gradient(180deg,var(--gold),#a88030)}
+.st-gold::after{background:var(--gold)}
+.st-sage::before{background:linear-gradient(180deg,var(--sage),#4a7850)}
+.st-sage::after{background:var(--sage)}
+.st-warn::before{background:linear-gradient(180deg,var(--warn),#a06030)}
+.st-warn::after{background:var(--warn)}
+.st-sky::before{background:linear-gradient(180deg,var(--sky),#4070a0)}
+.st-sky::after{background:var(--sky)}
+.sl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-family:'Lato',sans-serif}
+.sv{font-family:'Gowun Batang',serif;font-size:30px;font-weight:400;line-height:1;color:var(--ink)}
+.sv span{font-size:14px;opacity:.7}
+.sh2{font-size:10px;color:var(--muted);margin-top:6px}
+
+/* ── LAYOUT ──────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 300px;gap:18px}
+.g2l{display:grid;grid-template-columns:300px 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.mt{margin-top:18px}.gap{gap:18px}
+
+/* ── PILLS & TAGS ────────────────────── */
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:9.5px;font-weight:600;letter-spacing:.02em}
+.pg{background:var(--sageL);color:#2d6040}
+.pr{background:var(--redL);color:#8c2020}
+.pw{background:var(--warnL);color:#8c4a18}
+.pb{background:var(--skyL);color:#2a5080}
+.tag{
+  display:inline-flex;align-items:center;
+  padding:2px 9px;border-radius:20px;font-size:10px;font-weight:500;
+  letter-spacing:.01em;
+}
+.t-ki{background:#e2f0e6;color:#2d6040}
+.t-etc{background:#d8f0f0;color:#205858}
+.t-st{background:#e8f4ec;color:#2d5840}
+.t-md{background:#e8e4f5;color:#4a2870}
+.t-pr{background:#f0f0f6;color:#505068}
+.t-sp{background:#fff0d8;color:#7a4800}
+.t-lv2{background:#fde8e2;color:#8c2a18}
+.t-lv3{background:#ede6f7;color:#582a8c}
+
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.d-on{background:#52b86a}.d-warn{background:var(--warn)}.d-off{background:var(--dust)}
+
+/* ── AVATAR ──────────────────────────── */
+.ava{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;border:1.5px solid;
+  font-family:'Lato',sans-serif;
+}
+
+/* ── TABLE ───────────────────────────── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{
+  padding:8px 13px;text-align:left;
+  font-size:9px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);background:var(--surf2);
+  border-bottom:1px solid var(--bdr);font-weight:500;
+  position:sticky;top:0;z-index:1;
+  font-family:'Lato',sans-serif;
+}
+.tbl td{
+  padding:10px 13px;font-size:12px;
+  border-bottom:1px solid rgba(175,150,140,.08);
+  vertical-align:middle;transition:background .1s;
+}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--surf3)}
+.tbl-wrap{overflow-x:auto;overflow-y:auto;max-height:460px}
+
+/* ── FORM ────────────────────────────── */
+.fg{display:flex;flex-direction:column;gap:4px}
+.fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.fl{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600;font-family:'Lato',sans-serif}
+.fi,.fs,.fta{
+  padding:8px 11px;border:1px solid var(--bdr2);border-radius:var(--r);
+  font-size:12px;font-family:inherit;color:var(--ink);background:var(--surf);outline:none;
+  transition:all .15s ease;
+}
+.fi:focus,.fs:focus,.fta:focus{
+  border-color:var(--rose);
+  box-shadow:0 0 0 3px rgba(191,99,72,.1);
+}
+.fta{resize:vertical;min-height:70px;line-height:1.65}
+
+/* ── PROGRESS ────────────────────────── */
+.prog{height:4px;background:var(--roseL);border-radius:2px;overflow:hidden}
+.prog-f{height:100%;border-radius:2px;transition:width .5s cubic-bezier(.34,1.2,.64,1)}
+
+/* ── MODAL ───────────────────────────── */
+.mbg{
+  display:none;position:fixed;inset:0;
+  background:rgba(26,20,16,.5);backdrop-filter:blur(6px);
+  z-index:900;align-items:center;justify-content:center;
+}
+.mbg.on{display:flex}
+.mbox{
+  background:var(--surf);border-radius:var(--r2);
+  max-height:90vh;overflow-y:auto;box-shadow:var(--sh3);
+  animation:popIn .22s cubic-bezier(.34,1.3,.64,1);
+  border:1px solid var(--bdr);
+}
+.mbox.sm{width:480px}.mbox.md{width:560px}.mbox.lg{width:720px}.mbox.xl{width:860px}
+@keyframes popIn{from{transform:scale(.92) translateY(14px);opacity:0}to{transform:scale(1);opacity:1}}
+.mh{
+  padding:17px 22px 14px;border-bottom:1px solid var(--bdr);
+  display:flex;justify-content:space-between;align-items:center;
+  background:linear-gradient(180deg,var(--surf) 0%,var(--surf2) 100%);
+}
+.mh-t{font-family:'Gowun Batang',serif;font-size:17px;letter-spacing:.02em}
+.mh-x{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--surf2);border:1px solid var(--bdr2);cursor:pointer;
+  font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.mh-x:hover{background:var(--roseL);color:var(--rose);border-color:var(--rose)}
+.mb{padding:18px 22px}.mf{padding:12px 22px 18px;border-top:1px solid var(--bdr);display:flex;justify-content:flex-end;gap:8px}
+
+/* ── TOGGLE ──────────────────────────── */
+.tog{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s ease}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:transform .2s ease}
+.tog.on{background:var(--rose)}.tog.on::after{transform:translateX(16px)}.tog.off{background:var(--dust)}
+
+/* ── CHIPS & TABS ────────────────────── */
+.chip-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;
+  border:1px solid var(--bdr2);background:var(--surf);cursor:pointer;
+  transition:all .15s;color:var(--ink2);
+}
+.chip:hover{border-color:var(--rose);color:var(--rose);background:var(--roseLL)}
+.chip.on{background:var(--rose);color:#fff;border-color:var(--rose);box-shadow:0 1px 6px rgba(191,99,72,.3)}
+.inner-tabs{display:flex;border-bottom:1px solid var(--bdr);padding:0 18px;background:var(--surf2)}
+.inner-tab{padding:10px 14px;font-size:11.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.inner-tab:hover{color:var(--ink)}.inner-tab.on{color:var(--rose);border-bottom-color:var(--rose)}
+.inner-pane{display:none;padding:16px 20px}.inner-pane.on{display:block}
+
+/* ── KAKAO ───────────────────────────── */
+.kk-wrap{
+  background:linear-gradient(140deg,#f7e200,#ffe030);
+  border-radius:16px;padding:15px;
+  box-shadow:0 4px 20px rgba(245,220,0,.25),0 1px 4px rgba(0,0,0,.08);
+}
+.kk-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.kk-ava{width:34px;height:34px;border-radius:50%;background:var(--rose);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0;box-shadow:0 2px 6px rgba(191,99,72,.3)}
+.kk-name{font-size:12.5px;font-weight:700;color:#111}.kk-sub{font-size:9.5px;color:#888}
+.kk-bubble{
+  background:#fff;border-radius:2px 12px 12px 12px;
+  padding:12px 14px;font-size:12px;color:#111;line-height:1.75;
+  white-space:pre-wrap;word-break:break-all;min-height:60px;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+/* ── AUTO RULE ───────────────────────── */
+.rule{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r2);
+  padding:14px 18px;display:flex;align-items:center;gap:14px;
+  box-shadow:var(--sh);transition:all .15s ease;
+}
+.rule:hover{border-color:rgba(191,99,72,.25);box-shadow:var(--sh2)}
+.rule-ico{font-size:22px;flex-shrink:0}
+.rule-info{flex:1}
+.rule-t{font-size:12.5px;font-weight:500;margin-bottom:2px}
+.rule-d{font-size:11px;color:var(--muted)}
+.rule-meta{font-size:10px;color:var(--sage);margin-top:3px}
+
+/* ── NOTICE ──────────────────────────── */
+.notice{
+  background:linear-gradient(135deg,var(--warnL),#fffaf5);
+  border:1px solid rgba(200,126,66,.3);border-left:4px solid var(--warn);
+  border-radius:var(--r2);padding:13px 16px;
+  display:flex;align-items:center;gap:12px;margin-bottom:16px;
+  box-shadow:0 2px 12px rgba(200,126,66,.12);
+}
+.notice .n-ico{font-size:20px}.notice .n-body{flex:1}
+.notice .n-title{font-size:12.5px;font-weight:600;color:var(--warn);margin-bottom:2px}
+.notice .n-desc{font-size:11px;color:var(--muted)}
+
+/* ── QUICK ACTION ────────────────────── */
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.qa-btn{
+  background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r2);
+  padding:15px 12px;text-align:center;cursor:pointer;
+  transition:all .18s ease;box-shadow:var(--sh);
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+}
+.qa-btn:hover{transform:translateY(-3px);box-shadow:var(--sh2);border-color:var(--rose)}
+.qa-btn.urg{border-color:rgba(200,126,66,.35);background:linear-gradient(135deg,var(--warnL),#fff8f2)}
+.qa-btn .qa-ic{font-size:22px}
+.qa-btn .qa-t{font-size:11.5px;font-weight:600;color:var(--ink);line-height:1.4}
+.qa-btn .qa-s{font-size:9.5px;color:var(--muted)}
+.qa-btn.urg .qa-t{color:var(--warn)}
+
+/* ── REVENUE CHART ───────────────────── */
+.rev-wrap{display:flex;align-items:flex-end;gap:7px;height:90px}
+.rev-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.rev-bar{width:100%;border-radius:5px 5px 0 0;min-height:3px;transition:height .6s cubic-bezier(.34,1.2,.64,1)}
+.rev-col.cur .rev-bar{background:linear-gradient(180deg,var(--gold) 0%,rgba(201,164,86,.3) 100%)}
+.rev-col:not(.cur) .rev-bar{background:linear-gradient(180deg,var(--rose) 0%,rgba(191,99,72,.2) 100%)}
+.rev-lbl{font-size:9px;color:var(--muted)}.rev-val{font-size:9px;font-weight:600}
+.rev-col.cur .rev-val{color:var(--gold)}.rev-col:not(.cur) .rev-val{color:var(--rose)}
+
+/* ── DONUT ───────────────────────────── */
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.donut{position:relative;width:82px;height:82px;flex-shrink:0}
+.donut svg{transform:rotate(-90deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,.1))}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-val{font-family:'Gowun Batang',serif;font-size:17px;line-height:1}
+.donut-sub{font-size:8px;color:var(--muted);margin-top:1px}
+.donut-legend{display:flex;flex-direction:column;gap:5px;flex:1}
+.dl-item{display:flex;align-items:center;gap:6px;font-size:10.5px}
+.dl-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── PAGER ───────────────────────────── */
+.pager{display:flex;align-items:center;gap:5px;padding:11px 16px;border-top:1px solid var(--bdr);justify-content:space-between;background:var(--surf2)}
+.page-btn{
+  width:27px;height:27px;border-radius:var(--r);
+  border:1px solid var(--bdr2);background:var(--surf);cursor:pointer;
+  font-size:11px;display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);transition:all .13s;
+}
+.page-btn:hover{background:var(--roseLL);border-color:var(--rose);color:var(--rose)}
+.page-btn.on{background:var(--rose);color:#fff;border-color:var(--rose);box-shadow:0 1px 5px rgba(191,99,72,.3)}
+.page-btn:disabled{opacity:.3;cursor:default}
+.page-info{font-size:10.5px;color:var(--muted)}
+
+/* ── ALERT ROWS ──────────────────────── */
+.al-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(175,150,140,.08);transition:background .1s}
+.al-row:last-child{border-bottom:none}
+.al-row:hover{background:var(--surf3);margin:0 -4px;padding:10px 4px;border-radius:var(--r)}
+.al-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.al-body{flex:1;min-width:0}
+.al-name{font-size:12px;font-weight:500;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al-desc{font-size:10px;color:var(--muted)}
+.al-cta{font-size:10px;color:var(--rose);cursor:pointer;white-space:nowrap;font-weight:600;text-decoration:underline;text-underline-offset:2px;transition:opacity .13s}
+.al-cta:hover{opacity:.7}
+
+/* ── ATT CALENDAR ────────────────────── */
+.att-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.att-dh{text-align:center;font-size:9px;color:var(--muted);padding:2px 0;font-family:'Lato',sans-serif}
+.att-c{aspect-ratio:1;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transition:all .12s;font-weight:500}
+.att-c:hover:not(.a-blank):not(.a-future):not(.a-today){opacity:.8;transform:scale(.95)}
+.a-blank{background:transparent;pointer-events:none}
+.a-attend{background:var(--rose);color:#fff;box-shadow:0 1px 4px rgba(191,99,72,.3)}
+.a-absent{background:var(--roseL);color:#8c2a18}
+.a-today{background:var(--ink);color:#fff;box-shadow:0 1px 6px rgba(26,20,16,.3)}
+.a-future{background:var(--surf2);color:var(--dust);pointer-events:none}
+
+/* ── SCHEDULE ────────────────────────── */
+.sch-event{margin-bottom:3px;padding:4px 6px;border-radius:5px;font-size:9.5px;line-height:1.35;cursor:pointer;transition:opacity .12s}
+.sch-event:hover{opacity:.8}
+.se-ki{background:#e2f0e6;color:#2d6040;border-left:2px solid var(--sage)}
+.se-st{background:#e8f4ec;color:#2d5840;border-left:2px solid #5a9070}
+.se-md{background:#e8e4f5;color:#4a2870;border-left:2px solid #8060b8}
+.se-sp{background:#fff0d8;color:#7a4800;border-left:2px solid #c88030}
+.se-pr{background:#f2f2f6;color:#505068;border-left:2px solid #9898b8;font-style:italic}
+.se-etc{background:#d8f0f0;color:#205858;border-left:2px solid #50a0a0}
+
+/* ── TOAST ───────────────────────────── */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast-item{
+  background:linear-gradient(135deg,var(--ink2),var(--ink));
+  color:#fff;padding:11px 16px;border-radius:var(--r);
+  font-size:12px;display:flex;align-items:center;gap:9px;
+  box-shadow:var(--sh3);border-left:3px solid var(--gold);
+  animation:toastIn .25s cubic-bezier(.34,1.3,.64,1);
+  backdrop-filter:blur(8px);
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sb">
+  <div class="sb-logo">
+    <div class="sb-logo-en">Mary in Ballet</div>
+    <div class="sb-logo-ko">마두점 · 원장 관리 시스템</div>
+  </div>
+  <nav>
+    <div class="sb-sec">오늘</div>
+    <div class="sb-a on" data-pg="dash"><span class="ico">✦</span>홈 대시보드</div>
+    <div class="sb-a" data-pg="attend"><span class="ico">◉</span>출석 체크</div>
+    <div class="sb-sec">회원</div>
+    <div class="sb-a" data-pg="members"><span class="ico">◎</span>회원 관리 <span class="sb-badge gr" id="sbTotal">16</span></div>
+    <div class="sb-a" data-pg="expire"><span class="ico">⏰</span>만료 임박 <span class="sb-badge w" id="sbExp">4</span></div>
+    <div class="sb-sec">수업</div>
+    <div class="sb-a" data-pg="schedule"><span class="ico">◈</span>수업 스케줄</div>
+    <div class="sb-sec">데이터</div>
+    <div class="sb-a" data-pg="gsync"><span class="ico">🔗</span>구글 시트 연동</div>
+    <div class="sb-sec">마케팅</div>
+    <div class="sb-a" data-pg="kakao"><span class="ico">💬</span>카카오 발송</div>
+    <div class="sb-a" data-pg="auto"><span class="ico">⚙</span>자동화 <span class="sb-badge g" id="sbAuto">5</span></div>
+    <div class="sb-sec">정산</div>
+    <div class="sb-a" data-pg="payment"><span class="ico">◇</span>수강료 정산 <span class="sb-badge w" id="sbUnpaid">1</span></div>
+    <div class="sb-a" data-pg="analytics"><span class="ico">📊</span>매출 분석</div>
+  </nav>
+  <div class="sb-today">
+    <div class="sb-today-lbl">오늘 수업 · 수요일</div>
+    <div class="sb-today-item"><span class="dot"></span>발레 스트레칭 9:00</div>
+    <div class="sb-today-item"><span class="dot"></span>현대무용 14:00 (박소유)</div>
+    <div class="sb-today-item"><span class="dot"></span>초등발레 L0.5 오후 15:30</div>
+    <div class="sb-today-item"><span class="dot g"></span>쁘띠바발레(유아) 16:00</div>
+    <div class="sb-today-item"><span class="dot g"></span>초등발레 L0.5 저녁 17:00</div>
+    <div class="sb-today-item"><span class="dot"></span>콩쿨반 20:00</div>
+  </div>
+  <div class="sb-foot">🩰 Mary in Ballet<br>마두점 원장님 화이팅!</div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div class="tb-title" id="topTitle">홈 대시보드</div>
+    <div class="search-wrap">
+      <span style="color:var(--dust);font-size:12px">🔍</span>
+      <input type="text" id="gSearch" placeholder="이름, 수업반 검색..." oninput="doSearch(this.value)">
+    </div>
+    <button class="btn bo bs" onclick="openM('notify')">🔔 <span style="color:var(--rose)" id="nBadge">4</span></button>
+    <button class="btn bp" onclick="openM('addMem')">+ 회원 등록</button>
+  </div>
+
+  <div id="content">
+
+    <!-- DASHBOARD -->
+    <div class="page on" id="pg-dash">
+      <div class="notice" id="topBanner">
+        <div class="n-ico">⚠️</div>
+        <div class="n-body">
+          <div class="n-title">만료 임박 4명 — 카카오 알림 발송 추천</div>
+          <div class="n-desc">이승희, 이윤슬, 정민채, 양새미 — 7일 이내 수강권 만료. 재등록 안내 발송을 추천해요.</div>
+        </div>
+        <button class="btn bw bs" onclick="batchExpire()">💬 일괄 발송</button>
+        <button class="btn bo bs" onclick="this.closest('.notice').style.display='none'">✕</button>
+      </div>
+      <div class="qa-grid">
+        <div class="qa-btn urg" onclick="go('expire')"><div class="qa-ic">⏰</div><div class="qa-t">만료 임박<br>4명</div><div class="qa-s">1클릭 일괄 발송</div></div>
+        <div class="qa-btn" onclick="go('attend')"><div class="qa-ic">✅</div><div class="qa-t">오늘 출석<br>체크</div><div class="qa-s">수요일 수업 6개</div></div>
+        <div class="qa-btn urg" onclick="go('payment')"><div class="qa-ic">💰</div><div class="qa-t">미납 확인<br>1명</div><div class="qa-s">양새미 320,000원</div></div>
+        <div class="qa-btn" onclick="openM('addMem')"><div class="qa-ic">🌸</div><div class="qa-t">신규 등록<br>+ 웰컴 자동</div><div class="qa-s">카카오 자동 발송</div></div>
+      </div>
+      <div class="stat-grid c4">
+        <div class="stat-tile st-rose"><div class="sl">전체 회원</div><div class="sv" id="ds-tot">16</div><div class="sh2">수강생 16명 (수업 등록 20건)</div></div>
+        <div class="stat-tile st-gold"><div class="sl">이번달 수강료</div><div class="sv">4.1<span>M</span></div><div class="sh2"><span class="pill pg">납부 15명</span></div></div>
+        <div class="stat-tile st-warn"><div class="sl">만료 임박 (7일)</div><div class="sv" id="ds-exp">4</div><div class="sh2"><span class="pill pw">즉시 알림 필요</span></div></div>
+        <div class="stat-tile st-sage"><div class="sl">이번달 출석률</div><div class="sv">91<span>%</span></div><div class="sh2"><span class="pill pg">전반적 양호</span></div></div>
+      </div>
+      <div class="g2 gap">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="ch"><span class="ct">회원 현황</span><button class="btn bo bs" onclick="go('members')">전체 →</button></div>
+            <div class="tbl-wrap"><table class="tbl" id="dashTbl"></table></div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="ct">월별 수강료</span><span style="font-size:10px;color:var(--muted)">추이</span></div>
+            <div class="cb"><div class="rev-wrap" id="revChart"></div></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <div class="ch"><span class="ct">수업별 현황</span></div>
+            <div class="cb">
+              <div class="donut-wrap" id="classDonut"></div>
+              <div style="margin-top:12px" id="classProgress"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="ct">오늘 할일</span></div>
+            <div class="cb" style="padding:8px 14px" id="dashAlerts"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMBERS -->
+    <div class="page" id="pg-members">
+      <div class="chip-bar" id="memChips">
+        <span class="chip on" data-f="all">전체 <span id="chipAll">16</span>명</span>
+        <span class="chip" data-f="쁘띠바발레">쁘띠바발레</span>
+        <span class="chip" data-f="초등발레">초등발레</span>
+        <span class="chip" data-f="콩쿨반">콩쿨반</span>
+        <span class="chip" data-f="2레벨">2레벨</span>
+        <span class="chip" data-f="3레벨">3레벨</span>
+        <span class="chip" data-f="현대무용">현대무용</span>
+        <span class="chip" data-f="expire" style="color:var(--warn)">⚠ 만료임박</span>
+        <span class="chip" data-f="unpaid" style="color:var(--red)">💰 미납</span>
+      </div>
+      <div class="card">
+        <div class="ch">
+          <span class="ct">회원 목록</span>
+          <div style="display:flex;gap:7px">
+            <select class="fi bs" id="sortSel" style="width:110px" onchange="memSort=this.value;memPage=1;renderMemTable()">
+              <option value="name">이름순</option>
+              <option value="expire">만료일순</option>
+              <option value="cls">수업반순</option>
+            </select>
+            <button class="btn bo bs" onclick="exportCSV()">📥 CSV</button>
+            <button class="btn bp bs" onclick="openM('addMem')">+ 등록</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>이름</th><th>학년</th><th>수업반</th><th>수강권</th><th>만료일</th><th>D-Day</th><th>납부</th><th>유입</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody id="memBody"></tbody>
+          </table>
+        </div>
+        <div class="pager" id="memPager"></div>
+      </div>
+    </div>
+
+    <!-- EXPIRE -->
+    <div class="page" id="pg-expire">
+      <div class="card" style="margin-bottom:14px;background:var(--warnL);border-color:rgba(200,126,66,.35)">
+        <div class="cb" style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:18px">⏰</div>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:600;color:var(--warn);margin-bottom:2px">만료 임박 회원 — 1클릭 일괄 발송</div>
+            <div style="font-size:11px;color:var(--muted)">재등록 안내 메시지가 이름·만료일 포함해 개인화 발송됩니다.</div>
+          </div>
+          <button class="btn bw" onclick="batchExpire()">💬 전체 일괄 발송</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch"><span class="ct">만료 임박 회원</span><span style="font-size:11px;color:var(--muted)" id="expCnt"></span></div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th><input type="checkbox" id="chkAllExp" onchange="document.querySelectorAll('.exp-chk').forEach(c=>c.checked=this.checked)"></th><th>이름</th><th>학년</th><th>수업반</th><th>수강권</th><th>만료일</th><th>D-Day</th><th>연락처</th><th>액션</th></tr></thead>
+            <tbody id="expBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTEND -->
+    <div class="page" id="pg-attend">
+      <div class="g2l gap">
+        <div class="card">
+          <div class="ch">
+            <span class="ct">출석 달력</span>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="btn bo bs" onclick="changeAttMonth(-1)">◀</button>
+              <select class="fi bs" id="attYear" style="width:72px" onchange="renderCal()">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+              </select>
+              <select class="fi bs" id="attMonth" style="width:60px" onchange="renderCal()">
+                <option value="1">1월</option><option value="2">2월</option>
+                <option value="3" selected>3월</option><option value="4">4월</option>
+                <option value="5">5월</option><option value="6">6월</option>
+                <option value="7">7월</option><option value="8">8월</option>
+                <option value="9">9월</option><option value="10">10월</option>
+                <option value="11">11월</option><option value="12">12월</option>
+              </select>
+              <button class="btn bo bs" onclick="changeAttMonth(1)">▶</button>
+              <select class="fi bs" id="attSel" style="width:170px" onchange="renderCal()"></select>
+            </div>
+          </div>
+          <div class="cb">
+            <div style="display:flex;gap:10px;font-size:10px;margin-bottom:10px">
+              <span><span style="display:inline-block;width:9px;height:9px;background:var(--rose);border-radius:2px;vertical-align:middle;margin-right:3px"></span>출석</span>
+              <span><span style="display:inline-block;width:9px;height:9px;background:var(--roseL);border-radius:2px;vertical-align:middle;margin-right:3px"></span>결석</span>
+              <span><span style="display:inline-block;width:9px;height:9px;background:var(--ink);border-radius:2px;vertical-align:middle;margin-right:3px"></span>오늘</span>
+            </div>
+            <div class="att-grid" id="calGrid"></div>
+            <div style="height:1px;background:var(--bdr);margin:12px 0"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <span style="font-size:11px;color:var(--muted)" id="attRateText">이번달 출석률</span>
+              <span style="font-family:'Gowun Batang',serif;font-size:17px;color:var(--rose)" id="attRate">—</span>
+            </div>
+            <div class="prog"><div class="prog-f" id="attBar" style="width:0%;background:var(--rose)"></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch">
+            <span class="ct">오늘 출석 체크</span>
+            <div style="display:flex;gap:6px">
+              <select class="fi bs" id="attClassSel" style="width:180px" onchange="renderAttList()">
+                <option>발레 스트레칭 (9:00)</option>
+                <option>현대무용 (14:00)</option>
+                <option>초등발레 L0.5 오후 (15:30)</option>
+                <option>쁘띠바발레(유아) (16:00-16:30)</option>
+                <option>초등발레 L0.5 저녁 (17:00)</option>
+                <option>콩쿨반 (20:00)</option>
+                <option>쁘띠바발레 토요 (11:30)</option>
+                <option>초등발레 L0.5 토요 (12:30)</option>
+                <option>1:1 Private</option>
+              </select>
+              <button class="btn bo bs" onclick="allAttend()">전원출석</button>
+              <button class="btn bp bs" onclick="toast('✅ 출석 저장 완료!')">저장</button>
+            </div>
+          </div>
+          <div class="cb" style="padding:10px 14px" id="attList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div class="page" id="pg-schedule">
+      <div class="g2 gap">
+        <div class="card">
+          <div class="ch"><span class="ct">주간 시간표 (아이들 전용)</span><button class="btn bp bs" onclick="openM('addClass')">+ 수업 추가</button></div>
+          <div class="cb" id="schGrid" style="overflow-x:auto"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card">
+            <div class="ch"><span class="ct">수업별 정원 현황</span></div>
+            <div class="cb" id="classCapPanel"></div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="ct">오늘(수) 수업</span></div>
+            <div class="cb" style="padding:10px 12px" id="todayCls"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KAKAO -->
+    <div class="page" id="pg-kakao">
+      <div class="card">
+        <div class="inner-tabs" id="kkTabs">
+          <div class="inner-tab on" data-pane="kk-write">✍ 작성</div>
+          <div class="inner-tab" data-pane="kk-tmpl">📋 템플릿</div>
+          <div class="inner-tab" data-pane="kk-hist">📊 발송 내역</div>
+        </div>
+        <div class="inner-pane on" id="kk-write">
+          <div style="display:grid;grid-template-columns:1fr 270px;gap:18px">
+            <div>
+              <div class="fgrid2" style="margin-bottom:10px">
+                <div class="fg"><label class="fl">발송 대상</label>
+                  <select class="fs" id="kkTarget">
+                    <option>전체 회원 (16명)</option>
+                    <option>쁘띠바발레(유아) (2명)</option>
+                    <option>초등발레 L0.5 (5명)</option>
+                    <option>콩쿨반 (2명)</option>
+                    <option>발레 기본 2레벨 (6명)</option>
+                    <option>발레 심화 3레벨 (3명)</option>
+                    <option>현대무용 (1명)</option>
+                    <option>만료 예정 (4명)</option>
+                    <option>미납 (1명)</option>
+                    <option>메리 원생 (8명)</option>
+                    <option>기존 원생 (11명)</option>
+                  </select>
+                </div>
+                <div class="fg"><label class="fl">발송 시간</label>
+                  <select class="fs" id="kkTime"><option>즉시 발송</option><option>오늘 오후 2시</option><option>오늘 오후 7시</option><option>내일 오전 10시</option></select>
+                </div>
+              </div>
+              <div class="fg" style="margin-bottom:10px">
+                <label class="fl">메시지 본문 · <span style="text-transform:none;letter-spacing:0;font-size:9px">[이름] [수업] [만료일] [금액] 변수 사용 가능</span></label>
+                <textarea class="fta" id="kkMsg" style="min-height:150px" oninput="refreshKK()">안녕하세요 🩰 Mary in Ballet입니다!
+
+[이름] 학부모님, 안녕하세요.
+
+자녀분의 수강권이 곧 만료될 예정이에요.
+
+▪ 만료일 : [만료일]
+
+지금 재등록하시면 다음 달부터 바로 수업을 이어갈 수 있어요 ✨
+문의 · 010-7583-1743</textarea>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span id="kkCount" style="font-size:11px;color:var(--muted)">0자</span>
+                <div style="display:flex;gap:7px">
+                  <button class="btn bo bs" onclick="toast('💾 임시저장 완료')">임시저장</button>
+                  <button class="btn bg" onclick="sendKK()">📤 발송하기</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px">카카오톡 미리보기</div>
+              <div class="kk-wrap">
+                <div class="kk-head"><div class="kk-ava">🩰</div><div><div class="kk-name">Mary in Ballet</div><div class="kk-sub">채널 메시지</div></div></div>
+                <div class="kk-bubble" id="kkPreview"></div>
+              </div>
+              <div style="margin-top:10px;background:var(--goldL);border-radius:var(--r);padding:9px 12px">
+                <div style="font-size:11px;font-weight:600;margin-bottom:2px">💡 발송 팁</div>
+                <div style="font-size:10.5px;color:var(--muted);line-height:1.6">오전 10~11시 / 오후 7~8시 열람률 최고.<br>계좌: 하나 419-910700-11507 김태희</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="inner-pane" id="kk-tmpl"><div class="g3" id="tmplGrid"></div></div>
+        <div class="inner-pane" id="kk-hist">
+          <table class="tbl"><thead><tr><th>발송일시</th><th>내용</th><th>대상</th><th>발송수</th><th>열람률</th><th>상태</th></tr></thead>
+          <tbody id="histBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- AUTO -->
+    <div class="page" id="pg-auto">
+      <div style="max-width:620px">
+        <div style="margin-bottom:16px"><div style="font-family:'Gowun Batang',serif;font-size:20px;margin-bottom:4px">자동화 규칙</div>
+        <div style="font-size:12px;color:var(--muted)">조건 충족 시 학부모님께 카카오톡을 자동 발송합니다 🤖</div></div>
+        <div style="display:flex;flex-direction:column;gap:9px" id="autoList"></div>
+        <div style="height:1px;background:var(--bdr);margin:16px 0"></div>
+        <div class="card" style="background:var(--goldL);border-color:rgba(201,164,86,.4)">
+          <div class="cb">
+            <div style="font-size:13px;font-weight:600;margin-bottom:3px">🔗 카카오 비즈채널 연동</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px">연동 시 실제 카카오톡으로 자동 발송됩니다. 솔라피 연동 — 건당 약 8~15원.</div>
+            <div style="display:flex;gap:7px">
+              <button class="btn bg bs" onclick="toast('카카오 비즈채널 → 솔라피 연동 순서로 진행하세요!')">채널 연동 시작</button>
+              <button class="btn bo bs" onclick="toast('연동 가이드를 준비 중입니다')">연동 가이드</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="page" id="pg-payment">
+      <div class="stat-grid c4" style="margin-bottom:16px">
+        <div class="stat-tile st-gold"><div class="sl">이번달 수강료</div><div class="sv">4.1<span>M</span></div><div class="sh2">납부 15명</div></div>
+        <div class="stat-tile st-rose"><div class="sl">미납 금액</div><div class="sv" style="color:var(--rose)">320K</div><div class="sh2"><span class="pill pw">1명 미납 (양새미)</span></div></div>
+        <div class="stat-tile st-sage"><div class="sl">납부율</div><div class="sv">94<span>%</span></div><div class="sh2">15/16명</div></div>
+        <div class="stat-tile st-sky"><div class="sl">평균 수강료</div><div class="sv">228K</div><div class="sh2">회원당 평균</div></div>
+      </div>
+      <!-- 수강료 안내표 -->
+      <div class="card" style="margin-bottom:14px">
+        <div class="ch" style="cursor:pointer" onclick="var b=document.getElementById('feeTable');b.style.display=b.style.display==='none'?'block':'none'">
+          <span class="ct">📋 수강료 안내표</span>
+          <span style="font-size:11px;color:var(--muted)">클릭해서 펼치기 · 계좌 하나 419-910700-11507 김태희</span>
+        </div>
+        <div id="feeTable" style="display:none">
+          <div class="cb">
+            <div class="g3">
+              <div style="border:1px solid var(--bdr);border-radius:var(--r2);overflow:hidden">
+                <div style="background:var(--sageL);padding:9px 13px;border-bottom:1px solid var(--bdr)">
+                  <div style="font-size:12px;font-weight:700;color:#2d6040">1레벨 · 유아/초등/현대무용</div>
+                  <div style="font-size:10px;color:#5a9070">50분 · 1day 35,000원</div>
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+                  <tr style="background:var(--surf2)"><th style="padding:5px 10px;text-align:left;font-size:9.5px;color:var(--muted);font-weight:500">수강권</th><th style="padding:5px 10px;text-align:right;font-size:9.5px;color:var(--muted);font-weight:500">1개월(4주)</th><th style="padding:5px 10px;text-align:right;font-size:9.5px;color:var(--muted);font-weight:500">3개월(5%↓)</th></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주1회</td><td style="padding:6px 10px;text-align:right;font-weight:600">110,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">313,500</td></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주2회</td><td style="padding:6px 10px;text-align:right;font-weight:600">180,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">513,000</td></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주3회</td><td style="padding:6px 10px;text-align:right;font-weight:600">260,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">741,000</td></tr>
+                </table>
+              </div>
+              <div style="border:1px solid var(--bdr);border-radius:var(--r2);overflow:hidden">
+                <div style="background:var(--roseL);padding:9px 13px;border-bottom:1px solid var(--bdr)">
+                  <div style="font-size:12px;font-weight:700;color:#8c2a18">2레벨 · 발레 기본</div>
+                  <div style="font-size:10px;color:var(--rose)">90분 · 1day 45,000원</div>
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+                  <tr style="background:var(--surf2)"><th style="padding:5px 10px;text-align:left;font-size:9.5px;color:var(--muted);font-weight:500">수강권</th><th style="padding:5px 10px;text-align:right;font-size:9.5px;color:var(--muted);font-weight:500">1개월(4주)</th><th style="padding:5px 10px;text-align:right;font-size:9.5px;color:var(--muted);font-weight:500">3개월(5%↓)</th></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주1회</td><td style="padding:6px 10px;text-align:right;font-weight:600">150,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">427,500</td></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주2회</td><td style="padding:6px 10px;text-align:right;font-weight:600">280,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">798,000</td></tr>
+                </table>
+              </div>
+              <div style="border:1px solid var(--bdr);border-radius:var(--r2);overflow:hidden">
+                <div style="background:var(--goldL);padding:9px 13px;border-bottom:1px solid var(--bdr)">
+                  <div style="font-size:12px;font-weight:700;color:#7a4800">3레벨 · 발레 심화</div>
+                  <div style="font-size:10px;color:var(--gold)">120분 · 1day 50,000원</div>
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:11.5px">
+                  <tr style="background:var(--surf2)"><th style="padding:5px 10px;text-align:left;font-size:9.5px;color:var(--muted);font-weight:500">수강권</th><th style="padding:5px 10px;text-align:right;font-size:9.5px;color:var(--muted);font-weight:500">1개월(4주)</th><th style="padding:5px 10px;text-align:right;font-size:9.5px;color:var(--muted);font-weight:500">3개월(5%↓)</th></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주1회</td><td style="padding:6px 10px;text-align:right;font-weight:600">170,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">484,500</td></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주2회</td><td style="padding:6px 10px;text-align:right;font-weight:600">320,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">912,000</td></tr>
+                  <tr style="border-top:1px solid var(--bdr)"><td style="padding:6px 10px">주3회</td><td style="padding:6px 10px;text-align:right;font-weight:600">450,000</td><td style="padding:6px 10px;text-align:right;color:var(--rose)">1,282,500</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ch">
+          <span class="ct">3월 수강료 현황</span>
+          <div style="display:flex;gap:7px">
+            <button class="btn bw bs" onclick="toast('💬 양새미 학부모님께 납부 안내 발송!')">미납자 알림</button>
+            <button class="btn bo bs" onclick="exportCSV()">📥 내보내기</button>
+            <button class="btn bp bs" onclick="openM('addPay')">+ 납부 등록</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr><th>이름</th><th>수업반</th><th>수강권</th><th>금액</th><th>납부일</th><th>방법</th><th>상태</th><th>다음 결제일</th><th></th></tr></thead>
+            <tbody id="payBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- GSYNC -->
+    <div class="page" id="pg-gsync">
+      <div style="max-width:680px">
+
+        <div id="gsyncStatus" style="display:none;margin-bottom:14px"></div>
+
+        <!-- Step 1: URL 열기 -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ct">① 구글 시트 데이터 가져오기</span></div>
+          <div class="cb">
+            <div style="display:flex;flex-direction:column;gap:12px">
+
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:26px;height:26px;border-radius:50%;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div>
+                <div style="flex:1">
+                  <div style="font-size:12.5px;font-weight:500;margin-bottom:5px">아래 버튼으로 구글 시트 데이터 페이지 열기</div>
+                  <a href="https://script.google.com/macros/s/AKfycbwXGNw04iE_n9NOTguk5tBxAD2cUZQjVgu_0ibi8ZZrQ1PbM1r397WP0GAbtCbNVzXT3Q/exec" target="_blank">
+                    <button class="btn bp">🔗 데이터 페이지 열기</button>
+                  </a>
+                  <div style="font-size:11px;color:var(--muted);margin-top:5px">새 탭에 <code style="background:var(--surf2);padding:1px 5px;border-radius:3px">gasCallback({"status":"ok","members":[...]}</code> 형태의 텍스트가 보여야 해요.</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:26px;height:26px;border-radius:50%;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div>
+                <div style="flex:1">
+                  <div style="font-size:12.5px;font-weight:500;margin-bottom:5px">페이지 전체 선택(Ctrl+A) → 복사(Ctrl+C)</div>
+                  <div style="font-size:11px;color:var(--muted)">텍스트 전체를 복사해주세요.</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:26px;height:26px;border-radius:50%;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div>
+                <div style="flex:1">
+                  <div style="font-size:12.5px;font-weight:500;margin-bottom:5px">아래 입력창에 붙여넣기(Ctrl+V) → 동기화 버튼 클릭</div>
+                  <textarea class="fta" id="pasteData" style="min-height:90px;font-size:11px;font-family:monospace"
+                    placeholder="복사한 데이터를 여기에 붙여넣으세요...&#10;gasCallback({&quot;status&quot;:&quot;ok&quot;,&quot;members&quot;:[...]}"></textarea>
+                  <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+                    <button class="btn bp" style="flex:1;padding:10px" onclick="syncFromPaste()">🔄 동기화</button>
+                    <button class="btn bo bs" onclick="document.getElementById('pasteData').value=''">초기화</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- 동기화 옵션 -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="ch"><span class="ct">② 동기화 옵션</span></div>
+          <div class="cb">
+            <div style="display:flex;gap:16px;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer">
+                <input type="radio" name="syncMode" value="merge" checked style="accent-color:var(--rose)">
+                <div><b>병합 업데이트</b><div style="font-size:10.5px;color:var(--muted)">기존 회원 유지 + 시트 내용으로 업데이트</div></div>
+              </label>
+              <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer">
+                <input type="radio" name="syncMode" value="replace" style="accent-color:var(--rose)">
+                <div><b>전체 교체</b><div style="font-size:10.5px;color:var(--muted)">기존 데이터 삭제 후 시트 데이터로 교체</div></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 미리보기 -->
+        <div class="card" id="previewCard" style="display:none;margin-bottom:14px">
+          <div class="ch">
+            <span class="ct">동기화 결과 미리보기</span>
+            <span id="previewCnt" style="font-size:11px;color:var(--muted)"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead id="previewThead"></thead>
+              <tbody id="previewTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 마지막 동기화 -->
+        <div style="font-size:11px;color:var(--muted);text-align:center" id="lastSyncTime">마지막 동기화: —</div>
+
+      </div>
+    </div>
+    <!-- ANALYTICS -->
+    <div class="page" id="pg-analytics">
+      <div class="stat-grid c4">
+        <div class="stat-tile st-gold"><div class="sl">이번달 매출</div><div class="sv">4.1<span>M</span></div><div class="sh2">3월 기준</div></div>
+        <div class="stat-tile st-rose"><div class="sl">평균 수강료</div><div class="sv">228K</div><div class="sh2">회원 1인당</div></div>
+        <div class="stat-tile st-sage"><div class="sl">총 수강생</div><div class="sv">16</div><div class="sh2">메리5 + 기존11</div></div>
+        <div class="stat-tile st-sky"><div class="sl">신규 (이번달)</div><div class="sv">1</div><div class="sh2">이윤슬 (신규)</div></div>
+      </div>
+      <div class="g2 gap">
+        <div class="card"><div class="ch"><span class="ct">월별 수강료 추이</span></div><div class="cb"><div class="rev-wrap" id="analyticsChart"></div></div></div>
+        <div class="card"><div class="ch"><span class="ct">수업별 매출 비중</span></div><div class="cb" id="classRevDonut"></div></div>
+      </div>
+      <div class="card mt">
+        <div class="ch"><span class="ct">이탈 위험 회원</span><span style="font-size:10.5px;color:var(--muted)">출석률 80% 미만</span></div>
+        <div class="cb" style="padding:10px 14px" id="churnList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="mbg" id="modal-addMem">
+  <div class="mbox md">
+    <div class="mh"><div class="mh-t">🌸 신규 회원 등록</div><button class="mh-x" onclick="closeM('addMem')">✕</button></div>
+    <div class="mb">
+      <div class="fgrid2">
+        <div class="fg"><label class="fl">이름 *</label><input class="fi" id="nm-name" placeholder="홍길동"></div>
+        <div class="fg"><label class="fl">연락처 (학부모)</label><input class="fi" id="nm-phone" placeholder="010-7583-1743"></div>
+      </div>
+      <div class="fgrid3">
+        <div class="fg"><label class="fl">학년</label><input class="fi" id="nm-grade" placeholder="3학년 / 7세"></div>
+        <div class="fg"><label class="fl">유입 경로</label><select class="fs" id="nm-src"><option>기존</option><option>메리</option><option>신규</option><option>지인추천</option></select></div>
+        <div class="fg"><label class="fl">요일</label><input class="fi" id="nm-days" placeholder="월·수"></div>
+      </div>
+      <div class="fgrid2">
+        <div class="fg"><label class="fl">수업반 *</label>
+          <select class="fs" id="nm-cls">
+            <option>쁘띠바발레(유아)</option><option>쁘띠바발레 토요</option>
+            <option>초등발레 L0.5 오후</option><option>초등발레 L0.5 저녁</option><option>초등발레 L0.5 토요</option>
+            <option>콩쿨반</option><option>발레 기본 2레벨</option><option>발레 심화 3레벨</option>
+            <option>발레 스트레칭</option><option>현대무용</option><option>1:1 Private</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">수강권 *</label>
+          <select class="fs" id="nm-ticket">
+            <optgroup label="1레벨 (50분)">
+              <option value="1레벨 주1회(4주)">주1회 · 4주 110,000원</option>
+              <option value="1레벨 주2회(4주)">주2회 · 4주 180,000원</option>
+              <option value="1레벨 주3회(4주)">주3회 · 4주 260,000원</option>
+              <option value="1레벨 주1회(3개월)">주1회 · 3개월 313,500원</option>
+              <option value="1레벨 주2회(3개월)">주2회 · 3개월 513,000원</option>
+              <option value="1레벨 주3회(3개월)">주3회 · 3개월 741,000원</option>
+            </optgroup>
+            <optgroup label="2레벨 (90분)">
+              <option value="2레벨 주1회(4주)">주1회 · 4주 150,000원</option>
+              <option value="2레벨 주2회(4주)">주2회 · 4주 280,000원</option>
+              <option value="2레벨 주1회(3개월)">주1회 · 3개월 427,500원</option>
+              <option value="2레벨 주2회(3개월)">주2회 · 3개월 798,000원</option>
+            </optgroup>
+            <optgroup label="3레벨 (120분)">
+              <option value="3레벨 주1회(4주)">주1회 · 4주 170,000원</option>
+              <option value="3레벨 주2회(4주)">주2회 · 4주 320,000원</option>
+              <option value="3레벨 주3회(4주)">주3회 · 4주 450,000원</option>
+              <option value="3레벨 주1회(3개월)">주1회 · 3개월 484,500원</option>
+              <option value="3레벨 주2회(3개월)">주2회 · 3개월 912,000원</option>
+              <option value="3레벨 주3회(3개월)">주3회 · 3개월 1,282,500원</option>
+            </optgroup>
+            <optgroup label="기타"><option value="체험 1회">체험 1회 35,000원</option></optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label class="fl">메모</label><textarea class="fta" id="nm-memo" style="min-height:50px" placeholder="건강상태, 특이사항..."></textarea></div>
+      <div style="background:var(--sageL);border-radius:var(--r);padding:8px 12px;font-size:11px;color:#3a7040">✅ 등록 완료 시 웰컴 카카오톡 자동 발송 (자동화 ON 기준)</div>
+    </div>
+    <div class="mf"><button class="btn bo" onclick="closeM('addMem')">취소</button><button class="btn bp" onclick="addMember()">등록하기</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="modal-detail">
+  <div class="mbox lg">
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<div class="mbg" id="modal-notify">
+  <div class="mbox sm">
+    <div class="mh"><div class="mh-t">🔔 알림 센터</div><button class="mh-x" onclick="closeM('notify')">✕</button></div>
+    <div class="mb" id="notifyBody"></div>
+    <div class="mf"><button class="btn bo" onclick="document.getElementById('nBadge').textContent='0';toast('모두 읽음');closeM('notify')">모두 읽음</button><button class="btn bp" onclick="closeM('notify')">닫기</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="modal-addClass">
+  <div class="mbox sm">
+    <div class="mh"><div class="mh-t">수업 추가</div><button class="mh-x" onclick="closeM('addClass')">✕</button></div>
+    <div class="mb">
+      <div class="fgrid2"><div class="fg"><label class="fl">수업명</label><input class="fi" placeholder="쁘띠바발레(유아)"></div><div class="fg"><label class="fl">요일</label><select class="fs"><option>월</option><option>화</option><option>수</option><option>목</option><option>금</option><option>토</option></select></div></div>
+      <div class="fgrid2"><div class="fg"><label class="fl">시작 시간</label><input class="fi" type="time" value="16:00"></div><div class="fg"><label class="fl">정원</label><input class="fi" type="number" value="10"></div></div>
+    </div>
+    <div class="mf"><button class="btn bo" onclick="closeM('addClass')">취소</button><button class="btn bp" onclick="closeM('addClass');toast('✅ 수업 추가!')">추가</button></div>
+  </div>
+</div>
+
+<div class="mbg" id="modal-addPay">
+  <div class="mbox sm">
+    <div class="mh"><div class="mh-t">납부 등록</div><button class="mh-x" onclick="closeM('addPay')">✕</button></div>
+    <div class="mb">
+      <div class="fgrid2"><div class="fg"><label class="fl">회원</label><select class="fs" id="payMem"></select></div><div class="fg"><label class="fl">금액</label><input class="fi" type="number" placeholder="180000"></div></div>
+      <div class="fgrid2"><div class="fg"><label class="fl">납부일</label><input class="fi" type="date"></div><div class="fg"><label class="fl">방법</label><select class="fs"><option>계좌이체</option><option>카드</option><option>현금</option></select></div></div>
+    </div>
+    <div class="mf"><button class="btn bo" onclick="closeM('addPay')">취소</button><button class="btn bp" onclick="closeM('addPay');toast('💰 납부 등록!')">등록</button></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+
+<script>
+// ═══════════════════════════════════════════
+//  SUPABASE — fetch REST API 방식
+// ═══════════════════════════════════════════
+const SUPABASE_URL = 'https://vcilgdfbuvffzmihwnju.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZjaWxnZGZidXZmZnptaWh3bmp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTk1MTIsImV4cCI6MjA5MjM5NTUxMn0.wHDxvMqjwV_jVVcv8-8fgp4AppizMYCMMdJB6qpZaHE';
+const DB_HEADERS = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+};
+
+// GET — 회원 전체 조회
+async function loadMembersFromDB() {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/members?select=*&order=id', {
+      method: 'GET', headers: DB_HEADERS
+    });
+    if(!res.ok) { const e = await res.text(); toast('⚠ DB 오류: ' + e); return false; }
+    const data = await res.json();
+    if(!data || !data.length) return false;
+    const avaBgL=['#f5ddd5','#d5e8f5','#d5f0de','#f5ebd5','#e8d5f5','#d5eeee'];
+    const avaFgL=['#8c3020','#204878','#3a7040','#8c5018','#582a8c','#2a6060'];
+    members.splice(0, members.length);
+    data.forEach((row, i) => {
+      const ci = i % avaBgL.length;
+      members.push({
+        id:      row.id,
+        name:    row.name    || '',
+        phone:   row.phone   || '',
+        grade:   row.grade   || '—',
+        cls:     row.cls     || '—',
+        ticket:  row.ticket  || '—',
+        paid:    row.paid    || false,
+        expire:  row.expire  || '—',
+        days:    row.days    || '—',
+        status:  row.status  || 'active',
+        src:     row.src     || '—',
+        memo:    row.memo    || '',
+        amount:  row.amount  || 0,
+        attRate: row.att_rate|| 100,
+        avaBg:   avaBgL[ci],
+        avaFg:   avaFgL[ci],
+      });
+    });
+    return true;
+  } catch(e) {
+    toast('⚠ 네트워크 오류: ' + e.message);
+    return false;
+  }
+}
+
+// POST — 회원 추가
+async function saveMemberToDB(m) {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/members', {
+      method: 'POST',
+      headers: { ...DB_HEADERS, 'Prefer': 'return=representation' },
+      body: JSON.stringify({
+        name: m.name, phone: m.phone, grade: m.grade, cls: m.cls,
+        ticket: m.ticket, paid: m.paid, expire: m.expire, days: m.days,
+        status: m.status, src: m.src, memo: m.memo,
+        amount: m.amount, att_rate: m.attRate,
+      })
+    });
+    if(!res.ok) { const e = await res.text(); console.error('저장 오류:', e); return null; }
+    const data = await res.json();
+    return data[0] || null;
+  } catch(e) { console.error('저장 오류:', e); return null; }
+}
+
+// PATCH — 회원 수정
+async function updateMemberInDB(id, fields) {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/members?id=eq.' + id, {
+      method: 'PATCH',
+      headers: DB_HEADERS,
+      body: JSON.stringify(fields)
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+// DELETE — 회원 삭제
+async function deleteMemberFromDB(id) {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/members?id=eq.' + id, {
+      method: 'DELETE', headers: DB_HEADERS
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+// 전체 교체 (구글시트 동기화)
+async function syncMembersToDB(newMembers) {
+  try {
+    // 전체 삭제
+    await fetch(SUPABASE_URL + '/rest/v1/members?id=gte.0', {
+      method: 'DELETE', headers: DB_HEADERS
+    });
+    // 새 데이터 삽입
+    const rows = newMembers.map(m => ({
+      name: m.name, phone: m.phone, grade: m.grade, cls: m.cls,
+      ticket: m.ticket, paid: m.paid, expire: m.expire, days: m.days,
+      status: m.status || 'active', src: m.src || '구글시트',
+      memo: m.memo, amount: m.amount || 0, att_rate: m.attRate || 100,
+    }));
+    const res = await fetch(SUPABASE_URL + '/rest/v1/members', {
+      method: 'POST', headers: DB_HEADERS, body: JSON.stringify(rows)
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+// 수동 새로고침 (실시간 대신)
+function subscribeMembers() {
+  // 30초마다 DB 체크 (실시간 구독 대신 폴링)
+  setInterval(async () => {
+    const loaded = await loadMembersFromDB();
+    if(loaded) {
+      renderDash();
+      renderMemTable();
+      document.getElementById('sbTotal').textContent = members.length;
+      document.getElementById('ds-tot').textContent  = members.length;
+    }
+  }, 30000);
+}
+// ═══════════════════════════════════════════
+//  실제 회원 데이터 (메리인발레 마두점)
+// ═══════════════════════════════════════════
+const TODAY = '2026-03-02';
+
+const avaBg = ['#f5ddd5','#d5e8f5','#d5f0de','#f5ebd5','#e8d5f5','#d5eeee'];
+const avaFg = ['#8c3020','#204878','#3a7040','#8c5018','#582a8c','#2a6060'];
+
+// tagCls 맵
+const tagCls = {
+  '쁘띠바발레(유아)':'t-ki','쁘띠바발레 토요':'t-ki',
+  '초등발레 L0.5':'t-ki','초등발레 L0.5 오후':'t-ki',
+  '초등발레 L0.5 저녁':'t-ki','초등발레 L0.5 토요':'t-ki',
+  '콩쿨반':'t-etc','발레 스트레칭':'t-st',
+  '현대무용':'t-md','1:1 Private':'t-pr',
+  '발레 심화 3레벨':'t-lv3','발레 기본 2레벨':'t-lv2',
+};
+const dotCls = {active:'d-on',expire:'d-warn',pause:'d-off'};
+const stLbl  = {active:'활성',expire:'만료임박',pause:'일시정지'};
+
+let members = [
+  // ── 초등발레 ─────────────────────────────────────────────
+  {id:1,  name:'박영은', phone:'010-2575-3712', grade:'1학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'월·수', expire:'2026-03-22', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:90, avaBg:avaBg[0],avaFg:avaFg[0]},
+  {id:2,  name:'박나현', phone:'010-9482-0807', grade:'1학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'수·금', expire:'2026-03-20', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:85, avaBg:avaBg[1],avaFg:avaFg[1]},
+  {id:3,  name:'박소유', phone:'010-2960-4003', grade:'2학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'수',   expire:'2026-03-25', paid:true,  status:'active', src:'기존',    memo:'현대무용 병행 수강',       attRate:88, avaBg:avaBg[2],avaFg:avaFg[2]},
+  {id:4,  name:'김소예', phone:'010-4468-1015', grade:'2학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:92, avaBg:avaBg[3],avaFg:avaFg[3]},
+  {id:5,  name:'이승희', phone:'010-9055-2719', grade:'3학년', cls:'초등발레 L0.5 저녁', ticket:'1레벨 주2회(4주)',  amount:180000, days:'월·수', expire:'2026-03-05', paid:true,  status:'expire', src:'기존',    memo:'1day 결제 완료',           attRate:80, avaBg:avaBg[4],avaFg:avaFg[4]},
+  // ── 쁘띠바발레(유아) ──────────────────────────────────────
+  {id:6,  name:'김제아', phone:'010-4447-7252', grade:'유아',  cls:'쁘띠바발레(유아)',   ticket:'1레벨 주2회(4주)',  amount:180000, days:'화·목', expire:'2026-03-28', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:95, avaBg:avaBg[5],avaFg:avaFg[5]},
+  {id:7,  name:'이윤슬', phone:'010-8569-0232', grade:'7세',   cls:'쁘띠바발레(유아)',   ticket:'1레벨 주1회(4주)',  amount:110000, days:'목',   expire:'2026-03-10', paid:true,  status:'expire', src:'신규',    memo:'1day 결제 완료',           attRate:100,avaBg:avaBg[0],avaFg:avaFg[0]},
+  // ── 콩쿨반 · 3레벨 ───────────────────────────────────────
+  {id:8,  name:'이도아', phone:'',              grade:'4학년', cls:'콩쿨반',            ticket:'3레벨 주3회(4주)',  amount:450000, days:'월·수·금·토', expire:'2026-04-10', paid:true,  status:'active', src:'메리',    memo:'3레벨 병행 수강',          attRate:98, avaBg:avaBg[1],avaFg:avaFg[1]},
+  {id:9,  name:'박정현', phone:'',              grade:'3학년', cls:'콩쿨반',            ticket:'3레벨 주3회(4주)',  amount:450000, days:'월·수·금·토', expire:'2026-04-10', paid:true,  status:'active', src:'메리',    memo:'3레벨 병행 수강',          attRate:96, avaBg:avaBg[2],avaFg:avaFg[2]},
+  {id:10, name:'양새미', phone:'010-2314-0301', grade:'6학년', cls:'발레 심화 3레벨',   ticket:'3레벨 주3회(4주)',  amount:450000, days:'월·수·금', expire:'2026-03-08', paid:false, status:'expire', src:'메리/기존', memo:'1day 미결 320,000원',     attRate:90, avaBg:avaBg[3],avaFg:avaFg[3]},
+  // ── 발레 기본 2레벨 ──────────────────────────────────────
+  {id:11, name:'김서아', phone:'010-9029-0428', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-30', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:91, avaBg:avaBg[4],avaFg:avaFg[4]},
+  {id:12, name:'김수지', phone:'010-6538-4565', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-30', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:87, avaBg:avaBg[5],avaFg:avaFg[5]},
+  {id:13, name:'정민채', phone:'010-9597-0323', grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-07', paid:true,  status:'expire', src:'기존',    memo:'1day 결제 완료',           attRate:83, avaBg:avaBg[0],avaFg:avaFg[0]},
+  {id:14, name:'강하은', phone:'010-9174-2466', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-04-05', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:94, avaBg:avaBg[1],avaFg:avaFg[1]},
+  {id:15, name:'장시은', phone:'',              grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'메리',    memo:'',                         attRate:89, avaBg:avaBg[2],avaFg:avaFg[2]},
+  {id:16, name:'신유아', phone:'',              grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'메리',    memo:'',                         attRate:92, avaBg:avaBg[3],avaFg:avaFg[3]},
+];
+
+// ── 수업 데이터 ─────────────────────────────────────────────
+const classData = [
+  {n:'쁘띠바발레(유아)',    day:'월·화·수·목 16:00-17:20', cap:10, cur:2,  type:'ki'},
+  {n:'쁘띠바발레 토요',    day:'토 11:30-12:20',           cap:8,  cur:0,  type:'ki'},
+  {n:'초등발레 L0.5 오후', day:'화·수·목 15:30-16:20',    cap:10, cur:4,  type:'ki'},
+  {n:'초등발레 L0.5 저녁', day:'월·수 17:00-18:20',       cap:10, cur:1,  type:'ki'},
+  {n:'초등발레 L0.5 토요', day:'토 12:30-13:20',           cap:8,  cur:0,  type:'ki'},
+  {n:'콩쿨반',             day:'수·토 20:00-21:20',        cap:10, cur:2,  type:'etc'},
+  {n:'발레 스트레칭',      day:'월·수·금 9:00-9:50',       cap:12, cur:3,  type:'st'},
+  {n:'현대무용',           day:'수 14:00-14:50',            cap:10, cur:1,  type:'md'},
+  {n:'발레 심화 3레벨',    day:'월·수·금 18:00-20:00',     cap:8,  cur:3,  type:'sp'},
+  {n:'발레 기본 2레벨',    day:'화·목 18:30-20:00',        cap:8,  cur:6,  type:'sp'},
+  {n:'1:1 Private',        day:'매일 B반 (시간협의)',       cap:1,  cur:1,  type:'pr'},
+];
+
+// ── 자동화 규칙 ─────────────────────────────────────────────
+const autoRules = [
+  {ic:'⏰', t:'수강권 만료 리마인더',  d:'만료 7일 전 · 오전 10시',         meta:'이번달 4명 해당',      on:true},
+  {ic:'🌸', t:'신규 회원 웰컴',        d:'등록 직후 · 즉시 발송',           meta:'이번달 1명 발송 (이윤슬)',on:true},
+  {ic:'🎂', t:'생일 축하',             d:'생일 당일 · 오전 9시',            meta:'3월 생일 확인 필요',   on:true},
+  {ic:'💰', t:'수강료 미납 알림',      d:'매월 5일 · 미납 회원만',          meta:'현재 1명 (양새미)',    on:true},
+  {ic:'📉', t:'장기 결석 케어',        d:'2주 이상 결석 · 학부모 체크인',   meta:'현재 해당 없음',       on:true},
+  {ic:'🎉', t:'재등록 감사',           d:'재등록 완료 후 · 즉시',           meta:'비활성',               on:false},
+];
+
+// ── 템플릿 ─────────────────────────────────────────────────
+const templates = [
+  {ic:'⏰',n:'만료 리마인더',badge:'추천',
+   msg:`안녕하세요 🩰 Mary in Ballet입니다!\n\n[이름] 학부모님, 자녀분의 수강권이 7일 후 만료됩니다.\n\n▪ 만료일 : [만료일]\n\n지금 재등록하시면 다음 달 수업을 바로 이어갈 수 있어요 ✨\n📞 010-7583-1743`},
+  {ic:'🌸',n:'신규 웰컴',badge:'자동',
+   msg:`🌸 Mary in Ballet에 오신 것을 환영해요!\n\n[이름] 학부모님, 함께하게 되어 기뻐요 🩰\n\n▪ 수업 : [수업]\n▪ 수업일 : [요일]\n\n첫 수업 전 편안한 복장으로 오세요.\n문의 · 010-7583-1743`},
+  {ic:'🎂',n:'생일 축하',badge:'자동',
+   msg:`🎂 [이름] 어린이, 생일을 진심으로 축하해요!\n\nMary in Ballet 모두가 응원합니다 🩰✨\n\n🎁 생일 기념 1회 무료 수업권 선물!\n이번달 안에 꼭 사용해 주세요 🎀`},
+  {ic:'📢',n:'공지/휴원',badge:'',
+   msg:`📢 Mary in Ballet 공지사항\n\n학부모님, 안녕하세요 🩰\n\n[공지 내용]\n\n불편을 드려 죄송합니다.\n문의 · 010-7583-1743`},
+  {ic:'💰',n:'납부 안내',badge:'',
+   msg:`안녕하세요 🩰 Mary in Ballet입니다.\n\n[이름] 학부모님, 이번달 수강료 납부를 부탁드려요.\n\n▪ 금액 : [금액]\n▪ 계좌 : 하나 419-910700-11507 김태희\n\n감사합니다 🙏`},
+  {ic:'📅',n:'월간 일정',badge:'',
+   msg:`안녕하세요 🩰 Mary in Ballet입니다!\n\n[월]월 수업 일정 안내드려요.\n\n[일정 내용]\n\n변경사항 있으면 미리 알려주세요 😊`},
+];
+
+// ── 발송 내역 ───────────────────────────────────────────────
+const msgHistory = [
+  {date:'2026.02.25 10:00',content:'2월 수업 일정 안내',  target:'전체 16명',    count:19,open:84,done:true},
+  {date:'2026.02.20 14:00',content:'수강권 만료 리마인더',target:'만료 예정 4명',count:4, open:100,done:true},
+  {date:'2026.03.03 10:00',content:'3월 수업 일정 공지',  target:'전체 16명',    count:19,open:null,done:false},
+];
+
+// ── 정산 데이터 ─────────────────────────────────────────────
+const paymentsData = [
+  {name:'박영은', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
+  {name:'박나현', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
+  {name:'박소유', cls:'초등발레+현대무용',  ticket:'1레벨 주2회(4주)×2', amount:360000, date:'03.02', method:'현금',    paid:true,  nextPay:'04.02'},
+  {name:'김소예', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'카드',     paid:true,  nextPay:'04.01'},
+  {name:'이승희', cls:'초등발레 L0.5 저녁', ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
+  {name:'김제아', cls:'쁘띠바발레(유아)',   ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
+  {name:'이윤슬', cls:'쁘띠바발레(유아)',   ticket:'1레벨 주1회(4주)',  amount:110000, date:'03.01', method:'현금',     paid:true,  nextPay:'04.01'},
+  {name:'이도아', cls:'콩쿨반+3레벨',      ticket:'3레벨 주3회(4주)',  amount:450000, date:'03.02', method:'계좌이체', paid:true,  nextPay:'04.02'},
+  {name:'박정현', cls:'콩쿨반+3레벨',      ticket:'3레벨 주3회(4주)',  amount:450000, date:'03.02', method:'계좌이체', paid:true,  nextPay:'04.02'},
+  {name:'양새미', cls:'발레 심화 3레벨',   ticket:'3레벨 주3회(4주)',  amount:450000, date:'—',     method:'—',        paid:false, nextPay:'즉시'},
+  {name:'김서아', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
+  {name:'김수지', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.02', method:'카드',     paid:true,  nextPay:'04.02'},
+  {name:'정민채', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
+  {name:'강하은', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.01', method:'카드',     paid:true,  nextPay:'04.01'},
+  {name:'장시은', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.02', method:'계좌이체', paid:true,  nextPay:'04.02'},
+  {name:'신유아', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.02', method:'현금',     paid:true,  nextPay:'04.02'},
+];
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function dday(d){ return d&&d!=='—'?Math.ceil((new Date(d)-new Date(TODAY))/864e5):999 }
+function addDays(d,n){const dt=new Date(d);dt.setDate(dt.getDate()+n);return dt.toISOString().slice(0,10)}
+function fmtDate(d){return d&&d!=='—'?d.slice(5).replace('-','/'):'-'}
+function toast(msg,ms=3000){
+  const w=document.getElementById('toasts'),el=document.createElement('div');
+  el.className='toast-item';el.textContent=msg;w.appendChild(el);
+  setTimeout(()=>el.remove(),ms);
+}
+function openM(id){if(id==='notify')renderNotify();document.getElementById('modal-'+id).classList.add('on')}
+function closeM(id){document.getElementById('modal-'+id).classList.remove('on')}
+document.querySelectorAll('.mbg').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('on')}));
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+const pgTitles={dash:'홈 대시보드',gsync:'구글 시트 연동',members:'회원 관리',expire:'만료 임박',attend:'출석 체크',schedule:'수업 스케줄',kakao:'카카오 발송',auto:'자동화 설정',payment:'수강료 정산',analytics:'매출 분석'};
+const pgInits={
+  dash:renderDash, members:()=>{memPage=1;renderMemTable()}, gsync:renderGSync,
+  expire:renderExpire, attend:()=>{renderAttSelect();renderCal();renderAttList()},
+  schedule:renderSchedule, kakao:renderKakao,
+  auto:renderAuto, payment:renderPayment, analytics:renderAnalytics,
+};
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelectorAll('.sb-a').forEach(a=>a.classList.remove('on'));
+  const sa=document.querySelector(`.sb-a[data-pg="${id}"]`);
+  if(sa) sa.classList.add('on');
+  document.getElementById('topTitle').textContent=pgTitles[id]||id;
+  if(pgInits[id]) pgInits[id]();
+}
+document.querySelectorAll('.sb-a[data-pg]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.pg)));
+
+// ═══════════════════════════════════════════
+//  PAGINATION
+// ═══════════════════════════════════════════
+const PAGE_SIZE=15;
+let memPage=1,memFilter='all',memSort='name';
+
+function filteredMembers(){
+  let list=[...members];
+  if(memFilter==='expire') list=list.filter(m=>m.status==='expire');
+  else if(memFilter==='unpaid') list=list.filter(m=>!m.paid);
+  else if(memFilter==='쁘띠바발레') list=list.filter(m=>m.cls.includes('쁘띠바'));
+  else if(memFilter==='초등발레') list=list.filter(m=>m.cls.includes('초등발레'));
+  else if(memFilter==='2레벨') list=list.filter(m=>m.cls.includes('2레벨'));
+  else if(memFilter==='3레벨') list=list.filter(m=>m.cls.includes('3레벨'));
+  else if(memFilter!=='all') list=list.filter(m=>m.cls.includes(memFilter));
+  if(memSort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(memSort==='expire') list.sort((a,b)=>dday(a.expire)-dday(b.expire));
+  else if(memSort==='cls') list.sort((a,b)=>a.cls.localeCompare(b.cls));
+  return list;
+}
+
+function renderPager(id,cur,total,count,fn){
+  if(total<=1){document.getElementById(id).innerHTML=`<span class="page-info">총 ${count}명</span>`;return}
+  let html=`<span class="page-info">총 ${count}명 · ${cur}/${total} 페이지</span><div style="display:flex;gap:4px">`;
+  html+=`<button class="page-btn" onclick="(${fn})(1)" ${cur===1?'disabled':''}>«</button>`;
+  html+=`<button class="page-btn" onclick="(${fn})(${cur-1})" ${cur===1?'disabled':''}>‹</button>`;
+  for(let p=Math.max(1,cur-2);p<=Math.min(total,cur+2);p++) html+=`<button class="page-btn ${p===cur?'on':''}" onclick="(${fn})(${p})">${p}</button>`;
+  html+=`<button class="page-btn" onclick="(${fn})(${cur+1})" ${cur===total?'disabled':''}>›</button>`;
+  html+=`<button class="page-btn" onclick="(${fn})(${total})" ${cur===total?'disabled':''}>»</button></div>`;
+  document.getElementById(id).innerHTML=html;
+}
+
+// ═══════════════════════════════════════════
+//  RENDER: DASHBOARD
+// ═══════════════════════════════════════════
+function renderDash(){
+  const expire=members.filter(m=>m.status==='expire');
+  document.getElementById('ds-tot').textContent=members.length;
+  document.getElementById('ds-exp').textContent=expire.length;
+  document.getElementById('sbTotal').textContent=members.length;
+  document.getElementById('sbExp').textContent=expire.length;
+  document.getElementById('sbUnpaid').textContent=members.filter(m=>!m.paid).length;
+
+  // 회원 테이블 (전체)
+  document.getElementById('dashTbl').innerHTML=`
+    <thead><tr><th>이름</th><th>학년</th><th>수업반</th><th>수강권</th><th>만료일</th><th>상태</th><th></th></tr></thead>
+    <tbody>${members.map(m=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:7px">
+        <div class="ava" style="background:${m.avaBg};color:${m.avaFg};border-color:${m.avaFg}22">${m.name[0]}</div>
+        <div><div style="font-weight:500;font-size:12.5px">${m.name}</div><div style="font-size:10px;color:var(--muted)">${m.phone||'연락처 없음'}</div></div>
+      </div></td>
+      <td style="font-size:11.5px">${m.grade}</td>
+      <td><span class="tag ${tagCls[m.cls]||'t-ki'}">${m.cls}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${m.ticket}</td>
+      <td style="font-size:11.5px">${fmtDate(m.expire)}</td>
+      <td><span class="dot ${dotCls[m.status]}"></span> <span style="font-size:11px">${stLbl[m.status]}</span></td>
+      <td><button class="btn bo bs" onclick="openDetail(${m.id})">상세</button></td>
+    </tr>`).join('')}</tbody>`;
+
+  // 매출 차트
+  const rev=[{m:'10월',v:280},{m:'11월',v:310},{m:'12월',v:340},{m:'1월',v:380},{m:'2월',v:400},{m:'3월',v:410}];
+  const mx=Math.max(...rev.map(d=>d.v));
+  document.getElementById('revChart').innerHTML=rev.map((d,i)=>`
+    <div class="rev-col${i===rev.length-1?' cur':''}">
+      <div class="rev-val">${(d.v/100).toFixed(1)}M</div>
+      <div class="rev-bar" style="height:${Math.round(d.v/mx*85)}px"></div>
+      <div class="rev-lbl">${d.m}</div>
+    </div>`).join('');
+
+  // 수업별 도넛
+  const cnts={'쁘띠바발레':2,'초등발레':5,'콩쿨반·3레벨':5,'2레벨':6,'현대무용·기타':2};
+  const colors=['#739b80','#c06850','#c9a456','#6a96b8','#9060c0'];
+  const tot=Object.values(cnts).reduce((a,b)=>a+b,0);
+  const keys=Object.keys(cnts);
+  let offset=0;
+  const segs=keys.map((k,i)=>{
+    const pct=cnts[k]/tot;const dash=pct*251.2;
+    const s=`<circle cx="50" cy="50" r="40" fill="none" stroke="${colors[i]}" stroke-width="16" stroke-dasharray="${dash} ${251.2-dash}" stroke-dashoffset="${-offset*251.2}"/>`;
+    offset+=pct;return{s,color:colors[i],name:k,cnt:cnts[k]};
+  });
+  document.getElementById('classDonut').innerHTML=`
+    <div class="donut"><svg viewBox="0 0 100 100" width="80" height="80">${segs.map(s=>s.s).join('')}</svg>
+    <div class="donut-center"><div class="donut-val">${tot}</div><div class="donut-sub">전체</div></div></div>
+    <div class="donut-legend">${segs.map(s=>`<div class="dl-item"><div class="dl-dot" style="background:${s.color}"></div><span>${s.name}</span><span style="margin-left:auto;font-weight:600">${s.cnt}명</span></div>`).join('')}</div>`;
+
+  // 정원 현황
+  document.getElementById('classProgress').innerHTML=classData.filter(c=>c.type!=='pr').map(c=>{
+    const pct=Math.round(c.cur/c.cap*100);
+    const bar=c.type==='sp'?'var(--gold)':c.type==='ki'?'var(--sage)':c.type==='st'?'#5a9070':c.type==='md'?'#8060b8':'#50a0a0';
+    return `<div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px">
+        <span style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px">${c.n}</span>
+        <span style="flex-shrink:0;margin-left:4px;color:var(--muted)">${c.cur}/${c.cap}</span>
+      </div>
+      <div class="prog"><div class="prog-f" style="width:${pct}%;background:${bar}"></div></div>
+    </div>`;}).join('');
+
+  // 오늘 할일
+  const alerts=[
+    {ic:'⏰',bg:'var(--warnL)',   n:`만료 임박 ${expire.length}명`,            d:'이승희·이윤슬·정민채·양새미',   cta:'발송',fn:()=>batchExpire()},
+    {ic:'💰',bg:'var(--redL)',    n:'미납 1명 (양새미)',                         d:'320,000원 미결',                 cta:'알림',fn:()=>{toast('💬 양새미 납부 안내 발송!');go('payment')}},
+    {ic:'📋',bg:'var(--goldL)',   n:'정민채 1day 결제 완료',                     d:'다음 수강권 등록 안내 필요',     cta:'확인',fn:()=>go('payment')},
+    {ic:'🌸',bg:'var(--sageL)',   n:'이윤슬 신규 등록',                          d:'7세 신규 / 웰컴 메시지 발송됨', cta:'상세',fn:()=>openDetail(8)},
+  ];
+  window._af=alerts.map(a=>a.fn);
+  document.getElementById('dashAlerts').innerHTML=alerts.map((a,i)=>`
+    <div class="al-row">
+      <div class="al-ico" style="background:${a.bg}">${a.ic}</div>
+      <div class="al-body"><div class="al-name">${a.n}</div><div class="al-desc">${a.d}</div></div>
+      <span class="al-cta" onclick="_af[${i}]()">${a.cta}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  RENDER: MEMBERS
+// ═══════════════════════════════════════════
+function renderMemTable(){
+  const list=filteredMembers();
+  const total=list.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  memPage=Math.min(memPage,pages);
+  const slice=list.slice((memPage-1)*PAGE_SIZE,memPage*PAGE_SIZE);
+  document.getElementById('memBody').innerHTML=slice.map(m=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:7px">
+      <div class="ava" style="background:${m.avaBg};color:${m.avaFg};border-color:${m.avaFg}22">${m.name[0]}</div>
+      <div><div style="font-weight:500;font-size:12.5px">${m.name}</div><div style="font-size:10px;color:var(--muted)">${m.phone||'—'}</div></div>
+    </div></td>
+    <td style="font-size:11.5px">${m.grade}</td>
+    <td><span class="tag ${tagCls[m.cls]||'t-ki'}">${m.cls}</span></td>
+    <td style="font-size:11px;color:var(--muted)">${m.ticket}</td>
+    <td style="font-size:11.5px">${fmtDate(m.expire)}</td>
+    <td><span class="pill ${dday(m.expire)<=7?'pr':dday(m.expire)<=14?'pw':'pg'}">${dday(m.expire)<=30?'D-'+dday(m.expire):'—'}</span></td>
+    <td>${m.paid?`<span class="pill pg">납부</span>`:`<span class="pill pr">미납</span>`}</td>
+    <td style="font-size:10.5px;color:var(--muted)">${m.src}</td>
+    <td><span class="dot ${dotCls[m.status]}"></span> <span style="font-size:11px">${stLbl[m.status]}</span></td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn bo bs" onclick="openDetail(${m.id})">상세</button>
+      <button class="btn bo bs" onclick="quickKK('${m.name}')">💬</button>
+    </div></td>
+  </tr>`).join('');
+  renderPager('memPager',memPage,pages,total,(p)=>{memPage=p;renderMemTable()});
+}
+
+// 필터 칩
+document.getElementById('memChips').addEventListener('click',e=>{
+  const ch=e.target.closest('.chip');if(!ch||!ch.dataset.f)return;
+  document.querySelectorAll('#memChips .chip').forEach(c=>c.classList.remove('on'));
+  ch.classList.add('on');memFilter=ch.dataset.f;memPage=1;renderMemTable();
+});
+
+// ═══════════════════════════════════════════
+//  RENDER: EXPIRE
+// ═══════════════════════════════════════════
+function renderExpire(){
+  const list=members.filter(m=>m.status==='expire'||dday(m.expire)<=7).sort((a,b)=>dday(a.expire)-dday(b.expire));
+  document.getElementById('expCnt').textContent=list.length+'명';
+  document.getElementById('sbExp').textContent=list.length;
+  document.getElementById('expBody').innerHTML=list.map(m=>`<tr>
+    <td><input type="checkbox" class="exp-chk" value="${m.id}" style="accent-color:var(--rose)"></td>
+    <td><div style="display:flex;align-items:center;gap:7px">
+      <div class="ava" style="background:${m.avaBg};color:${m.avaFg};border-color:${m.avaFg}22">${m.name[0]}</div>
+      <b style="font-size:12.5px">${m.name}</b>
+    </div></td>
+    <td style="font-size:11.5px">${m.grade}</td>
+    <td><span class="tag ${tagCls[m.cls]||'t-ki'}">${m.cls}</span></td>
+    <td style="font-size:11px;color:var(--muted)">${m.ticket}</td>
+    <td style="font-size:11.5px">${fmtDate(m.expire)}</td>
+    <td><span class="pill ${dday(m.expire)<=3?'pr':'pw'}">D-${dday(m.expire)}</span></td>
+    <td style="font-size:11.5px">${m.phone||'—'}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn bg bs" onclick="toast('💬 ${m.name} 학부모님께 만료 안내 발송!')">💬 발송</button>
+      <button class="btn bo bs" onclick="openDetail(${m.id})">상세</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  RENDER: ATTENDANCE
+// ═══════════════════════════════════════════
+function renderAttSelect(){
+  document.getElementById('attSel').innerHTML=members.map(m=>`<option value="${m.id}">${m.name} (${m.cls})</option>`).join('');
+  document.getElementById('payMem').innerHTML=members.map(m=>`<option>${m.name}</option>`).join('');
+}
+// 출석 데이터 저장소 (회원ID → {년월 → {날짜: 'attend'|'absent'}})
+const attData = {};
+
+function getAttKey(mid, year, month){ return `${mid}_${year}_${month}`; }
+
+function renderCal(){
+  const yearEl  = document.getElementById('attYear');
+  const monthEl = document.getElementById('attMonth');
+  const selEl   = document.getElementById('attSel');
+  if(!yearEl||!monthEl||!selEl) return;
+
+  const year  = parseInt(yearEl.value);
+  const month = parseInt(monthEl.value);
+  const mid   = selEl.value || (members[0]&&members[0].id);
+
+  // 오늘 날짜
+  const todayDate = new Date(TODAY);
+  const isCurrentMonth = (todayDate.getFullYear()===year && todayDate.getMonth()+1===month);
+  const todayDay = isCurrentMonth ? todayDate.getDate() : -1;
+
+  // 해당 월의 마지막 날
+  const daysInMonth = new Date(year, month, 0).getDate();
+  // 1일의 요일 (0=일)
+  const firstDow = new Date(year, month-1, 1).getDay();
+
+  // 샘플 데이터 (현재월이면 기본값 주입, 나머지는 저장된 값 사용)
+  const key = getAttKey(mid, year, month);
+  if(!attData[key]){
+    attData[key] = {};
+    if(isCurrentMonth){
+      // 현재월 기본 출석 데이터
+      [1,4,5,6,7,8,11,12,13,14,15,18,19,20,21].forEach(d=>{ if(d<todayDay) attData[key][d]='attend'; });
+      [3,9,10].forEach(d=>{ if(d<todayDay) attData[key][d]='absent'; });
+    } else if(year===2026 && month===2){
+      // 지난달 샘플
+      [1,2,3,4,5,8,9,10,11,15,16,17,18,22,23,24,25].forEach(d=>attData[key][d]='attend');
+      [6,12,19,26].forEach(d=>attData[key][d]='absent');
+    } else if(year===2026 && month===1){
+      [2,3,6,7,8,9,13,14,15,16,20,21,22,23,27,28].forEach(d=>attData[key][d]='attend');
+      [5,12,19].forEach(d=>attData[key][d]='absent');
+    }
+    // 미래달은 빈 데이터
+  }
+
+  const rec = attData[key];
+  const attendDays = Object.values(rec).filter(v=>v==='attend').length;
+  const absentDays = Object.values(rec).filter(v=>v==='absent').length;
+  const total = attendDays + absentDays;
+  const rate  = total > 0 ? Math.round(attendDays/total*100) : 0;
+
+  document.getElementById('attRate').textContent = total > 0 ? rate+'%' : '—';
+  document.getElementById('attBar').style.width  = rate+'%';
+
+  const days = ['일','월','화','수','목','금','토'];
+  let html = days.map(d=>`<div class="att-dh">${d}</div>`).join('');
+
+  // 1일 전 빈칸
+  for(let i=0;i<firstDow;i++) html+=`<div class="att-c a-blank"></div>`;
+
+  const isFuture = (year > todayDate.getFullYear()) ||
+    (year === todayDate.getFullYear() && month > todayDate.getMonth()+1);
+
+  for(let d=1;d<=daysInMonth;d++){
+    let cls;
+    if(d === todayDay)          cls = 'a-today';
+    else if(isFuture)           cls = 'a-future';
+    else if(rec[d]==='attend')  cls = 'a-attend';
+    else if(rec[d]==='absent')  cls = 'a-absent';
+    else if(!isCurrentMonth || d < todayDay) cls = 'a-future'; // 미입력
+    else                        cls = 'a-future';
+    html += `<div class="att-c ${cls}" onclick="togAtt(this,${d},${year},${month},'${mid}')">${d}</div>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+
+  // 출석률 텍스트 업데이트
+  const attRateText = document.getElementById('attRateText');
+  if(attRateText) attRateText.textContent = `${year}년 ${month}월 출석률`;
+}
+
+function togAtt(el, d, year, month, mid){
+  const todayDate = new Date(TODAY);
+  const isCurrentMonth = (todayDate.getFullYear()===year && todayDate.getMonth()+1===month);
+  const todayDay = isCurrentMonth ? todayDate.getDate() : -1;
+  const isFuture = (year > todayDate.getFullYear()) ||
+    (year === todayDate.getFullYear() && month > todayDate.getMonth()+1);
+  if(isFuture || d===todayDay) return;
+
+  const key = getAttKey(mid, year, month);
+  if(!attData[key]) attData[key]={};
+  const cur = attData[key][d];
+  if(cur==='attend')      { attData[key][d]='absent';  el.className='att-c a-absent'; }
+  else if(cur==='absent') { delete attData[key][d];    el.className='att-c a-future'; }
+  else                    { attData[key][d]='attend';  el.className='att-c a-attend'; }
+
+  // 출석률 재계산
+  const rec = attData[key];
+  const attendDays = Object.values(rec).filter(v=>v==='attend').length;
+  const absentDays = Object.values(rec).filter(v=>v==='absent').length;
+  const total = attendDays+absentDays;
+  const rate = total>0?Math.round(attendDays/total*100):0;
+  document.getElementById('attRate').textContent = total>0?rate+'%':'—';
+  document.getElementById('attBar').style.width = rate+'%';
+}
+
+function changeAttMonth(dir){
+  const yearEl  = document.getElementById('attYear');
+  const monthEl = document.getElementById('attMonth');
+  let year  = parseInt(yearEl.value);
+  let month = parseInt(monthEl.value) + dir;
+  if(month > 12){ month=1; year++; }
+  if(month < 1) { month=12; year--; }
+  // 연도 옵션에 없으면 추가
+  if(![...yearEl.options].find(o=>parseInt(o.value)===year)){
+    const opt=document.createElement('option');
+    opt.value=year;opt.textContent=year;
+    year>parseInt(yearEl.options[yearEl.options.length-1].value)
+      ? yearEl.appendChild(opt)
+      : yearEl.insertBefore(opt, yearEl.options[0]);
+  }
+  yearEl.value  = year;
+  monthEl.value = month;
+  renderCal();
+}
+function togAtt(el,d){
+  if(d>=2)return;
+  const m={'a-attend':'a-absent','a-absent':'a-future','a-future':'a-attend'};
+  const cur=[...el.classList].find(c=>c.startsWith('a-'));
+  if(cur&&m[cur]){el.classList.remove(cur);el.classList.add(m[cur]);}
+}
+function renderAttList(){
+  const sel=document.getElementById('attClassSel').value;
+  let list=[];
+  if(sel.includes('쁘띠바')) list=members.filter(m=>m.cls.includes('쁘띠바'));
+  else if(sel.includes('초등발레 L0.5 오후')||sel.includes('초등발레 L0.5 저녁')) list=members.filter(m=>m.cls.includes('초등발레'));
+  else if(sel.includes('콩쿨반')) list=members.filter(m=>m.cls==='콩쿨반');
+  else if(sel.includes('현대무용')) list=members.filter(m=>m.cls==='현대무용');
+  else if(sel.includes('발레 스트레칭')) list=members.filter(m=>m.cls==='발레 스트레칭');
+  else list=members.filter(m=>m.cls.includes('2레벨')||m.cls.includes('3레벨'));
+  if(!list.length) list=members;
+  document.getElementById('attList').innerHTML=list.map(m=>`
+    <div id="ar-${m.id}" style="display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:var(--surf2);border-radius:var(--r);margin-bottom:5px;transition:.12s">
+      <div style="display:flex;align-items:center;gap:7px">
+        <div class="ava" style="width:25px;height:25px;font-size:10px;background:${m.avaBg};color:${m.avaFg};border-color:${m.avaFg}22">${m.name[0]}</div>
+        <span style="font-size:12px;font-weight:500">${m.name}</span>
+        <span style="font-size:10px;color:var(--muted)">${m.grade}</span>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="btn bs" style="background:var(--rose);color:#fff" onclick="markAtt(${m.id},'O')">출석</button>
+        <button class="btn bo bs" onclick="markAtt(${m.id},'X')">결석</button>
+      </div>
+    </div>`).join('');
+}
+function markAtt(id,type){
+  const el=document.getElementById('ar-'+id);
+  if(el) el.style.cssText+=(type==='O'?'border-left:3px solid var(--rose)':'border-left:3px solid var(--warn)');
+  toast(type==='O'?'✅ 출석 처리':'📋 결석 처리');
+}
+function allAttend(){
+  document.querySelectorAll('[id^="ar-"]').forEach(el=>el.style.cssText+='border-left:3px solid var(--rose)');
+  toast('✅ 전원 출석 처리!');
+}
+
+// ═══════════════════════════════════════════
+//  RENDER: SCHEDULE
+// ═══════════════════════════════════════════
+function renderSchedule(){
+  const days=['월','화','수','목','금','토'];
+  const todayDay='수';
+  const SCH={
+    '월':{A:[{n:'발레 스트레칭',t:'9:00-9:50',cls:'se-st'},{n:'쁘띠바발레(유아)',t:'16:00-17:20',cls:'se-ki'},{n:'초등발레 L0.5 저녁',t:'17:00-18:20',cls:'se-ki'},{n:'발레 심화 3레벨',t:'18:00-20:00',cls:'se-sp'}],B:[{n:'1:1 Private',t:'시간협의',cls:'se-pr'}]},
+    '화':{A:[{n:'초등발레 L0.5 오후',t:'15:30-16:20',cls:'se-ki'},{n:'쁘띠바발레(유아)',t:'16:30-17:20',cls:'se-ki'}],B:[{n:'1:1 Private',t:'시간협의',cls:'se-pr'},{n:'발레 기본 2레벨',t:'18:30-20:00',cls:'se-sp'}]},
+    '수':{A:[{n:'발레 스트레칭',t:'9:00-9:50',cls:'se-st'},{n:'현대무용',t:'14:00-14:50',cls:'se-md'},{n:'초등발레 L0.5 오후',t:'15:30-16:20',cls:'se-ki'},{n:'쁘띠바발레(유아)',t:'16:00-17:20',cls:'se-ki'},{n:'초등발레 L0.5 저녁',t:'17:00-18:20',cls:'se-ki'},{n:'발레 심화 3레벨',t:'18:00-20:00',cls:'se-sp'},{n:'콩쿨반',t:'20:00-21:20',cls:'se-etc'}],B:[{n:'1:1 Private',t:'시간협의',cls:'se-pr'}]},
+    '목':{A:[{n:'초등발레 L0.5 오후',t:'15:30-16:20',cls:'se-ki'},{n:'쁘띠바발레(유아)',t:'16:30-17:20',cls:'se-ki'}],B:[{n:'1:1 Private',t:'시간협의',cls:'se-pr'},{n:'발레 기본 2레벨',t:'18:30-20:00',cls:'se-sp'}]},
+    '금':{A:[{n:'발레 스트레칭',t:'9:00-9:50',cls:'se-st'},{n:'발레 심화 3레벨',t:'18:00-20:00',cls:'se-sp'}],B:[{n:'1:1 Private',t:'시간협의',cls:'se-pr'}]},
+    '토':{A:[{n:'쁘띠바발레 토요',t:'11:30-12:20',cls:'se-ki'},{n:'초등발레 L0.5 토요',t:'12:30-13:20',cls:'se-ki'},{n:'콩쿨반',t:'20:00-21:20',cls:'se-etc'}],B:[{n:'1:1 Private',t:'시간협의',cls:'se-pr'}]},
+  };
+  const legend=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:9px 11px;background:var(--surf2);border-radius:var(--r);font-size:10px">
+    <b style="color:var(--ink2);margin-right:2px">범례</b>
+    ${[['유아·어린이','se-ki'],['발레 심화·기본','se-sp'],['스트레칭','se-st'],['현대무용','se-md'],['콩쿨반','se-etc'],['1:1 Private','se-pr']].map(([l,k])=>{
+      const colors={'se-ki':'#e2f0e6','se-sp':'#fff0d8','se-st':'#e8f4ec','se-md':'#e8e4f5','se-etc':'#d8f0f0','se-pr':'#f2f2f6'};
+      const borders={'se-ki':'var(--sage)','se-sp':'#c88030','se-st':'#5a9070','se-md':'#8060b8','se-etc':'#50a0a0','se-pr':'#9898b8'};
+      return `<span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:${colors[k]};border-left:2px solid ${borders[k]};display:inline-block;border-radius:2px"></span>${l}</span>`;
+    }).join('')}
+  </div>`;
+  const grid=`<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;min-width:700px">${days.map(d=>{
+    const isToday=d===todayDay;
+    const evA=(SCH[d]||{A:[],B:[]}).A||[];const evB=(SCH[d]||{A:[],B:[]}).B||[];
+    return `<div style="border-radius:var(--r);border:${isToday?'1.5px solid var(--rose)':'1px solid var(--bdr)'};background:${isToday?'var(--surf)':'var(--surf2)'};overflow:hidden">
+      <div style="text-align:center;font-size:11px;font-weight:700;padding:6px 4px;background:${isToday?'var(--roseLL)':'transparent'};color:${isToday?'var(--rose)':'var(--ink2)'};border-bottom:1px solid var(--bdr);letter-spacing:.05em">${d}요일${isToday?' 🩰':''}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:50px">
+        <div style="padding:5px 4px;border-right:1px solid var(--bdr)">
+          <div style="font-size:8px;color:var(--muted);text-align:center;margin-bottom:3px;font-weight:600;letter-spacing:.1em">A반</div>
+          ${evA.map(e=>`<div class="sch-event ${e.cls}"><div style="font-weight:600">${e.n}</div><div style="opacity:.7;font-size:8px">${e.t}</div></div>`).join('')}
+        </div>
+        <div style="padding:5px 4px">
+          <div style="font-size:8px;color:var(--muted);text-align:center;margin-bottom:3px;font-weight:600;letter-spacing:.1em">B반</div>
+          ${evB.map(e=>`<div class="sch-event ${e.cls}"><div style="font-weight:600">${e.n}</div><div style="opacity:.7;font-size:8px">${e.t}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;}).join('')}</div>`;
+  document.getElementById('schGrid').innerHTML=legend+grid;
+
+  // 정원 현황
+  document.getElementById('classCapPanel').innerHTML=classData.filter(c=>c.type!=='pr').map(c=>{
+    const bar=c.type==='sp'?'var(--gold)':c.type==='ki'?'var(--sage)':c.type==='st'?'#5a9070':c.type==='md'?'#8060b8':'#50a0a0';
+    const pct=Math.round(c.cur/c.cap*100);
+    return `<div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:2px">
+        <span style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:155px">${c.n}</span>
+        <span style="flex-shrink:0;margin-left:4px;color:var(--muted)">${c.cur}/${c.cap}</span>
+      </div>
+      <div class="prog"><div class="prog-f" style="width:${pct}%;background:${bar}"></div></div>
+    </div>`;}).join('');
+
+  // 오늘(수) 수업
+  const todayEvs=(SCH[todayDay]||{A:[]}).A||[];
+  document.getElementById('todayCls').innerHTML=`
+    <div style="font-size:10px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.1em">수요일 A반 ${todayEvs.length}개 수업</div>
+    ${todayEvs.map(e=>{
+      const colorMap={'se-ki':'var(--sage)','se-sp':'var(--gold)','se-st':'#5a9070','se-md':'#8060b8','se-etc':'#50a0a0','se-pr':'#9898b8'};
+      return `<div style="padding:7px 9px;background:var(--surf2);border-radius:var(--r);margin-bottom:5px;border-left:3px solid ${colorMap[e.cls]||'var(--rose)'}">
+        <div style="font-size:11.5px;font-weight:500">${e.n}</div>
+        <div style="font-size:9.5px;color:var(--muted)">${e.t}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ═══════════════════════════════════════════
+//  RENDER: KAKAO
+// ═══════════════════════════════════════════
+function renderKakao(){ refreshKK();renderTemplates();renderHistory(); }
+function refreshKK(){
+  const msg=document.getElementById('kkMsg').value;
+  document.getElementById('kkPreview').textContent=msg;
+  document.getElementById('kkCount').textContent=msg.length+'자';
+}
+function renderTemplates(){
+  document.getElementById('tmplGrid').innerHTML=templates.map((t,i)=>`
+    <div style="background:var(--surf);border:1.5px solid var(--bdr);border-radius:var(--r2);padding:13px;cursor:pointer;transition:.14s;position:relative"
+      onclick="applyTmpl(${i})" onmouseover="this.style.borderColor='var(--rose)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--bdr)';this.style.transform=''">
+      ${t.badge?`<span class="pill pg" style="position:absolute;top:9px;right:9px">${t.badge}</span>`:''}
+      <div style="font-size:20px;margin-bottom:7px">${t.ic}</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:3px">${t.n}</div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.5">${t.msg.split('\n')[0]}</div>
+    </div>`).join('');
+}
+function applyTmpl(i){
+  document.getElementById('kkMsg').value=templates[i].msg;refreshKK();
+  document.querySelectorAll('#kkTabs .inner-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.inner-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelector('#kkTabs .inner-tab').classList.add('on');
+  document.getElementById('kk-write').classList.add('on');
+  toast('📝 템플릿 적용!');
+}
+function renderHistory(){
+  document.getElementById('histBody').innerHTML=msgHistory.map(h=>`<tr>
+    <td style="font-size:11px;color:var(--muted)">${h.date}</td><td style="font-size:12px">${h.content}</td>
+    <td style="font-size:11.5px">${h.target}</td><td>${h.count}명</td>
+    <td>${h.open!=null?`<b style="color:var(--rose)">${h.open}%</b>`:'—'}</td>
+    <td>${h.done?`<span class="pill pg">완료</span>`:`<span class="pill pw">예약</span>`}</td>
+  </tr>`).join('');
+}
+function sendKK(){
+  const t=document.getElementById('kkTarget');
+  const target=t.options[t.selectedIndex].text;
+  const time=document.getElementById('kkTime').value;
+  toast(time==='즉시 발송'?`💬 ${target}에게 발송 완료!`:`📅 ${time}에 예약됨`);
+  renderHistory();
+}
+document.getElementById('kkTabs').addEventListener('click',e=>{
+  const t=e.target.closest('.inner-tab[data-pane]');if(!t)return;
+  document.querySelectorAll('#kkTabs .inner-tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.inner-pane').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.pane).classList.add('on');
+});
+
+// ═══════════════════════════════════════════
+//  GOOGLE SHEET SYNC — 붙여넣기 방식
+// ═══════════════════════════════════════════
+
+const FIELD_MAP = {
+  '성함':'name','이름':'name','성명':'name',
+  '연락처':'phone','전화번호':'phone','전화':'phone',
+  '수업':'cls','수업반':'cls',
+  '수강권':'ticket',
+  '주2회':'days','요일/시간':'schedule','요일':'days',
+  '등록회차':'totalSessions','잔여회차':'remain',
+  '연장 여부':'extended',
+  '수납상태':'paid','납부여부':'paid','납부':'paid',
+  '만료일':'expire','시작일':'startDate',
+  '학년':'grade','금액':'amount','번호':'seq','메모':'memo',
+};
+
+function renderGSync(){ /* 붙여넣기 방식은 별도 초기화 불필요 */ }
+
+function showSyncStatus(msg, type){
+  if(!type) type = 'info';
+  var el = document.getElementById('gsyncStatus');
+  if(!el) return;
+  var bg, bd, co, ic;
+  if(type==='success'){ bg='var(--sageL)'; bd='var(--sage)'; co='#2d6040'; ic='✅'; }
+  else if(type==='error'){ bg='var(--redL)'; bd='var(--red)'; co='#8c2020'; ic='❌'; }
+  else if(type==='loading'){ bg='var(--goldL)'; bd='var(--gold)'; co='#7a4800'; ic='⏳'; }
+  else { bg='var(--skyL)'; bd='var(--sky)'; co='#204878'; ic='ℹ️'; }
+  el.style.display = 'block';
+  el.innerHTML = '<div style="background:'+bg+';border:1px solid '+bd+';border-left:4px solid '+bd+';border-radius:var(--r2);padding:12px 16px;font-size:12px;color:'+co+';display:flex;align-items:center;gap:9px"><span>'+ic+'</span><span>'+msg+'</span></div>';
+}
+
+function parsePaid(val){
+  if(!val) return false;
+  var v = val.toString().trim().toLowerCase();
+  if(['미납','x','no','false','0','미완','미결'].indexOf(v) !== -1) return false;
+  if(['완납','완료','납부','납','y','yes','true','o','1','입금','결제완료'].indexOf(v) !== -1) return true;
+  if(!isNaN(parseFloat(v)) && parseFloat(v) > 0) return true;
+  return false;
+}
+
+function mapRow(rowObj){
+  var mapped = {};
+  var keys = Object.keys(rowObj);
+  for(var k=0; k<keys.length; k++){
+    var key = keys[k].trim();
+    var field = FIELD_MAP[key];
+    if(field) mapped[field] = rowObj[keys[k]];
+    mapped['_'+key] = rowObj[keys[k]];
+  }
+  if(mapped.paid !== undefined) mapped.paid = parsePaid(mapped.paid);
+  if(mapped.amount){
+    var amt = mapped.amount.toString().replace(/[^0-9]/g,'');
+    mapped.amount = amt ? parseInt(amt) : 0;
+  }
+  if(mapped.expire && mapped.expire.indexOf('GMT') !== -1){
+    var d = new Date(mapped.expire);
+    if(!isNaN(d)){
+      mapped.expire = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    }
+  }
+  return mapped;
+}
+
+function buildCls(rowObj){
+  var ticket = rowObj['수강권'] || '';
+  if(ticket.indexOf('유아') !== -1 || ticket.indexOf('쁘띠') !== -1) return '쁘띠바발레(유아)';
+  if(ticket.indexOf('초등') !== -1) return '초등발레 L0.5 오후';
+  if(ticket.indexOf('현대') !== -1) return '현대무용';
+  if(ticket.indexOf('콩쿨') !== -1) return '콩쿨반';
+  if(ticket.indexOf('3레벨') !== -1 || ticket.indexOf('심화') !== -1) return '발레 심화 3레벨';
+  if(ticket.indexOf('2레벨') !== -1 || ticket.indexOf('기본') !== -1) return '발레 기본 2레벨';
+  var schedule = rowObj['요일/시간'] || rowObj['요일'] || '';
+  if(schedule) return schedule;
+  return ticket || '—';
+}
+
+function renderGASPreview(rows){
+  if(!rows || !rows.length) return;
+  var card = document.getElementById('previewCard');
+  if(card) card.style.display = 'block';
+  var cntEl = document.getElementById('previewCnt');
+  if(cntEl) cntEl.textContent = rows.length + '명';
+  var headers = Object.keys(rows[0]).filter(function(h){ return h.indexOf('_') !== 0; });
+  var thead = document.getElementById('previewThead');
+  var tbody = document.getElementById('previewTbody');
+  if(!thead||!tbody) return;
+  thead.innerHTML = '<tr>'+headers.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr>';
+  var display = rows.slice(0,6);
+  tbody.innerHTML = display.map(function(row){
+    return '<tr>'+headers.map(function(h){ return '<td style="font-size:11.5px">'+(row[h]||'—')+'</td>'; }).join('')+'</tr>';
+  }).join('')+(rows.length>6?'<tr><td colspan="'+headers.length+'" style="text-align:center;color:var(--muted);font-size:11px;padding:8px">... 외 '+(rows.length-6)+'명</td></tr>':'');
+}
+
+function applyMembers(memberList, mode){
+  var avaBgL = ['#f5ddd5','#d5e8f5','#d5f0de','#f5ebd5','#e8d5f5','#d5eeee'];
+  var avaFgL = ['#8c3020','#204878','#3a7040','#8c5018','#582a8c','#2a6060'];
+  var addedCnt = 0, updatedCnt = 0;
+
+  if(mode === 'replace'){
+    members.splice(0, members.length);
+    for(var i=0; i<memberList.length; i++){
+      var m = memberList[i]; m.id = i+1;
+      members.push(m);
+    }
+    addedCnt = memberList.length;
+  } else {
+    for(var i=0; i<memberList.length; i++){
+      var nm = memberList[i];
+      var idx = -1;
+      for(var x=0; x<members.length; x++){
+        if(members[x].name === nm.name){ idx=x; break; }
+      }
+      if(idx >= 0){
+        members[idx].phone  = nm.phone  || members[idx].phone;
+        members[idx].cls    = nm.cls   !== '—' ? nm.cls    : members[idx].cls;
+        members[idx].ticket = nm.ticket !== '—' ? nm.ticket : members[idx].ticket;
+        members[idx].paid   = nm.paid;
+        members[idx].grade  = nm.grade !== '—' ? nm.grade  : members[idx].grade;
+        members[idx].memo   = nm.memo  || members[idx].memo;
+        members[idx].expire = nm.expire !== '—' ? nm.expire : members[idx].expire;
+        updatedCnt++;
+      } else {
+        nm.id = members.length+1;
+        members.push(nm);
+        addedCnt++;
+      }
+    }
+  }
+
+  renderDash();
+  renderAttSelect();
+  document.getElementById('sbTotal').textContent = members.length;
+  document.getElementById('ds-tot').textContent  = members.length;
+
+  var now = new Date();
+  var ts = now.getFullYear()+'.'+String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  var lastEl = document.getElementById('lastSyncTime');
+  if(lastEl) lastEl.textContent = '마지막 동기화: '+ts;
+
+  var msg = mode==='replace'
+    ? '전체 교체 완료! '+members.length+'명으로 업데이트됐어요.'
+    : '동기화 완료! '+updatedCnt+'명 업데이트 · '+addedCnt+'명 신규 추가';
+  showSyncStatus(msg, 'success');
+  toast('🔄 구글 시트 동기화 중... DB에 저장하고 있어요');
+  // Supabase DB에도 동기화
+  syncMembersToDB(members).then(ok => {
+    if(ok) toast('✅ DB 저장 완료! 총 '+members.length+'명 — 선생님과 실시간 공유됩니다');
+    else toast('⚠ DB 저장 실패 — 인터넷 연결 확인해주세요');
+  });
+}
+
+function syncFromPaste(){
+  var raw = document.getElementById('pasteData').value.trim();
+  if(!raw){ showSyncStatus('데이터를 붙여넣어 주세요.', 'error'); return; }
+
+  showSyncStatus('데이터 분석 중...', 'loading');
+
+  // gasCallback({...}) 또는 순수 JSON 모두 처리
+  var jsonStr = raw;
+  var cbMatch = raw.match(/^[a-zA-Z_][a-zA-Z0-9_]*\((.+)\)\s*;?\s*$/s);
+  if(cbMatch) jsonStr = cbMatch[1];
+
+  var json;
+  try {
+    json = JSON.parse(jsonStr);
+  } catch(e) {
+    showSyncStatus('데이터 형식 오류 — 페이지 전체를 Ctrl+A로 선택 후 복사해주세요.', 'error');
+    return;
+  }
+
+  if(!json.members || !json.members.length){
+    showSyncStatus('회원 데이터가 없어요. 시트가 비어있지 않은지 확인해주세요.', 'error');
+    return;
+  }
+
+  var avaBgL = ['#f5ddd5','#d5e8f5','#d5f0de','#f5ebd5','#e8d5f5','#d5eeee'];
+  var avaFgL = ['#8c3020','#204878','#3a7040','#8c5018','#582a8c','#2a6060'];
+
+  var newList = [];
+  for(var i=0; i<json.members.length; i++){
+    var rawRow = json.members[i];
+    var m = mapRow(rawRow);
+    if(!m.name) continue;
+    var existing = null;
+    for(var x=0; x<members.length; x++){
+      if(members[x].name === m.name){ existing = members[x]; break; }
+    }
+    var ci = i % avaBgL.length;
+    newList.push({
+      id:      existing ? existing.id : members.length+i+100,
+      name:    m.name || '',
+      phone:   m.phone   || (existing ? existing.phone  : ''),
+      cls:     m.cls || buildCls(rawRow) || (existing ? existing.cls : '—'),
+      ticket:  m.ticket  || (existing ? existing.ticket : '—'),
+      paid:    m.paid !== undefined ? m.paid : (existing ? existing.paid : false),
+      grade:   m.grade   || (existing ? existing.grade  : '—'),
+      memo:    m.memo    || (existing ? existing.memo   : ''),
+      expire:  m.expire  || (existing ? existing.expire : '—'),
+      days:    m.schedule || m.days || (existing ? existing.days : '—'),
+      status:  existing ? existing.status  : 'active',
+      src:     existing ? existing.src     : '구글시트',
+      amount:  m.amount  || (existing ? existing.amount : 0),
+      attRate: existing ? existing.attRate : 100,
+      avaBg:   existing ? existing.avaBg   : avaBgL[ci],
+      avaFg:   existing ? existing.avaFg   : avaFgL[ci],
+    });
+  }
+
+  renderGASPreview(json.members);
+
+  var modeEl = document.querySelector('input[name="syncMode"]:checked');
+  var mode = modeEl ? modeEl.value : 'merge';
+  applyMembers(newList, mode);
+}
+// ═══════════════════════════════════════════
+//  RENDER: AUTO
+// ═══════════════════════════════════════════
+function renderAuto(){
+  document.getElementById('autoList').innerHTML=autoRules.map((r,i)=>`
+    <div class="rule">
+      <div class="rule-ico">${r.ic}</div>
+      <div class="rule-info"><div class="rule-t">${r.t}</div><div class="rule-d">${r.d}</div><div class="rule-meta">${r.meta}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <button class="tog ${r.on?'on':'off'}" id="tog-${i}" onclick="togRule(${i})"></button>
+        <span style="font-size:9px;color:var(--muted)" id="togl-${i}">${r.on?'활성':'비활성'}</span>
+      </div>
+    </div>`).join('');
+  document.getElementById('sbAuto').textContent=autoRules.filter(r=>r.on).length;
+}
+function togRule(i){
+  autoRules[i].on=!autoRules[i].on;const on=autoRules[i].on;
+  document.getElementById('tog-'+i).className='tog '+(on?'on':'off');
+  document.getElementById('togl-'+i).textContent=on?'활성':'비활성';
+  toast(on?`✅ "${autoRules[i].t}" 활성화`:`⏸ "${autoRules[i].t}" 비활성화`);
+  document.getElementById('sbAuto').textContent=autoRules.filter(r=>r.on).length;
+}
+
+// ═══════════════════════════════════════════
+//  RENDER: PAYMENT
+// ═══════════════════════════════════════════
+function renderPayment(){
+  document.getElementById('payBody').innerHTML=paymentsData.map(p=>`<tr style="${!p.paid?'background:#fff8f5':''}">
+    <td style="font-weight:500">${p.name}</td>
+    <td><span class="tag ${tagCls[p.cls]||'t-ki'}">${p.cls}</span></td>
+    <td style="font-size:11px;color:var(--muted)">${p.ticket}</td>
+    <td style="font-weight:600">${(p.amount/10000).toFixed(0)}만원</td>
+    <td style="font-size:11.5px">${p.date}</td>
+    <td style="font-size:11.5px">${p.method}</td>
+    <td>${p.paid?`<span class="pill pg">납부완료</span>`:`<span class="pill pr">미납</span>`}</td>
+    <td>${p.nextPay==='즉시'
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--redL);color:var(--red);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">⚠ 즉시</span>`
+      : `<span style="font-size:11.5px;color:var(--ink2)">${p.nextPay}</span>`
+    }</td>
+    <td>${!p.paid?`<button class="btn bo bs" onclick="toast('💬 ${p.name} 납부 안내 발송!')">알림</button>`:''}</td>
+  </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  RENDER: ANALYTICS
+// ═══════════════════════════════════════════
+function renderAnalytics(){
+  const rev=[{m:'10월',v:280},{m:'11월',v:310},{m:'12월',v:340},{m:'1월',v:380},{m:'2월',v:400},{m:'3월',v:410}];
+  const mx=Math.max(...rev.map(d=>d.v));
+  document.getElementById('analyticsChart').innerHTML=`<div class="rev-wrap">${rev.map((d,i)=>`
+    <div class="rev-col${i===rev.length-1?' cur':''}">
+      <div class="rev-val">${(d.v/100).toFixed(1)}M</div>
+      <div class="rev-bar" style="height:${Math.round(d.v/mx*85)}px"></div>
+      <div class="rev-lbl">${d.m}</div>
+    </div>`).join('')}</div>`;
+
+  const clsRev={'초등발레':900,'2레벨':1680,'3레벨':1350,'쁘띠바발레':290,'콩쿨반':900,'기타':180};
+  const colors=['#c06850','#6a96b8','#c9a456','#739b80','#d8f0f0','#e8e4f5'];
+  const tot=Object.values(clsRev).reduce((a,b)=>a+b,0);
+  let offset=0;
+  const segs2=Object.entries(clsRev).map(([k,v],i)=>{
+    const pct=v/tot;const dash=pct*251.2;
+    const s=`<circle cx="50" cy="50" r="40" fill="none" stroke="${colors[i]}" stroke-width="16" stroke-dasharray="${dash} ${251.2-dash}" stroke-dashoffset="${-offset*251.2}"/>`;
+    offset+=pct;return{s,color:colors[i],name:k,v};
+  });
+  document.getElementById('classRevDonut').innerHTML=`<div class="donut-wrap">
+    <div class="donut"><svg viewBox="0 0 100 100" width="80" height="80">${segs2.map(s=>s.s).join('')}</svg>
+    <div class="donut-center"><div class="donut-val">${(tot/100).toFixed(1)}M</div><div class="donut-sub">합계</div></div></div>
+    <div class="donut-legend">${segs2.map(s=>`<div class="dl-item"><div class="dl-dot" style="background:${s.color}"></div><span>${s.name}</span><span style="margin-left:auto;font-weight:600">${(s.v/100).toFixed(1)}M</span></div>`).join('')}</div>
+  </div>`;
+
+  const churns=members.filter(m=>m.attRate<85);
+  document.getElementById('churnList').innerHTML=churns.length?churns.map(m=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(180,155,145,.1)">
+      <div class="ava" style="background:${m.avaBg};color:${m.avaFg};border-color:${m.avaFg}22">${m.name[0]}</div>
+      <div style="flex:1"><div style="font-size:12px;font-weight:500">${m.name}</div><div style="font-size:10px;color:var(--muted)">${m.cls} · 출석률 ${m.attRate}%</div></div>
+      <button class="btn bo bs" onclick="toast('💬 ${m.name} 케어 메시지 발송!')">💬</button>
+    </div>`).join('')
+    :`<div style="text-align:center;padding:20px;font-size:12px;color:var(--muted)">이탈 위험 회원 없음 🌸</div>`;
+}
+
+// ═══════════════════════════════════════════
+//  MEMBER DETAIL
+// ═══════════════════════════════════════════
+function openDetail(id){
+  const m=members.find(x=>x.id===id);if(!m)return;
+  document.getElementById('detailContent').innerHTML=`
+    <div style="background:linear-gradient(135deg,var(--ink) 0%,#2d2020 100%);border-radius:var(--r2) var(--r2) 0 0;padding:18px 22px;color:#fff;position:relative;overflow:hidden">
+      <div style="position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:50px;opacity:.06">🩰</div>
+      <button class="mh-x" style="position:absolute;top:14px;right:14px" onclick="closeM('detail')">✕</button>
+      <div style="font-family:'Gowun Batang',serif;font-size:20px;color:var(--gold)">${m.name}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;display:flex;gap:12px">
+        <span>${m.grade}</span><span>${m.cls}</span><span>${m.src}</span>
+        ${m.phone?`<span>${m.phone}</span>`:''}
+      </div>
+    </div>
+    <div class="mb">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px">
+        ${[
+          ['수강권',m.ticket],
+          ['수강 요일',m.days||'—'],
+          ['만료일',fmtDate(m.expire)],
+          ['D-Day',dday(m.expire)<=30?`D-${dday(m.expire)}`:'—'],
+          ['납부 상태',m.paid?`<span class="pill pg">납부완료</span>`:`<span class="pill pr">미납</span>`],
+          ['이번달 출석률',`<span style="color:var(--rose);font-weight:600">${m.attRate}%</span>`],
+        ].map(([l,v])=>`<div style="background:var(--surf2);border-radius:var(--r);padding:10px 12px">
+          <div class="fl" style="margin-bottom:3px">${l}</div>
+          <div style="font-size:12.5px">${v}</div>
+        </div>`).join('')}
+      </div>
+      ${m.memo?`<div style="background:var(--goldL);border-radius:var(--r);padding:9px 12px;font-size:11.5px;margin-bottom:12px"><b>메모:</b> ${m.memo}</div>`:''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn bo bs" onclick="closeM('detail');quickKK('${m.name}')">💬 카카오 발송</button>
+        <button class="btn bo bs" onclick="toast('수강권 변경!')">수강권 변경</button>
+        <button class="btn bo bs" onclick="go('attend')">출석 이력</button>
+        <button class="btn bo bs" style="margin-left:auto;color:var(--warn);border-color:rgba(200,126,66,.4)" onclick="toast('일시정지 처리됨')">일시정지</button>
+        <button class="btn bo bs" style="color:var(--red);border-color:var(--redL)" onclick="if(confirm('탈퇴 처리하시겠어요?')){closeM('detail');toast('탈퇴 처리됨')}">탈퇴</button>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bo" onclick="closeM('detail')">닫기</button><button class="btn bp" onclick="toast('✅ 저장됨');closeM('detail')">저장</button></div>`;
+  openM('detail');
+}
+
+// ═══════════════════════════════════════════
+//  NOTIFY
+// ═══════════════════════════════════════════
+function renderNotify(){
+  const items=[
+    {ic:'⏰',bg:'var(--warnL)',n:'만료 임박 4명',d:'이승희·이윤슬·정민채·양새미',cta:'발송',fn:()=>{closeM('notify');batchExpire()}},
+    {ic:'💰',bg:'var(--redL)', n:'미납 1명 (양새미)',d:'320,000원 미결',          cta:'확인',fn:()=>{closeM('notify');go('payment')}},
+    {ic:'📋',bg:'var(--goldL)',n:'정민채 1day 결제 완료',d:'다음 수강권 등록 안내',cta:'확인',fn:()=>{closeM('notify');go('payment')}},
+    {ic:'🌸',bg:'var(--sageL)',n:'이윤슬 신규 등록',d:'7세 신규 / 웰컴 발송됨', cta:'상세',fn:()=>{closeM('notify');openDetail(8)}},
+  ];
+  window._nf=items.map(a=>a.fn);
+  document.getElementById('notifyBody').innerHTML=items.map((a,i)=>`
+    <div class="al-row">
+      <div class="al-ico" style="background:${a.bg}">${a.ic}</div>
+      <div class="al-body"><div class="al-name">${a.n}</div><div class="al-desc">${a.d}</div></div>
+      <span class="al-cta" onclick="_nf[${i}]()">${a.cta}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════
+async function addMember(){
+  const name=document.getElementById('nm-name').value.trim();
+  const phone=document.getElementById('nm-phone').value.trim();
+  if(!name){toast('⚠ 이름을 입력해주세요');return;}
+  const ci=members.length%avaBg.length;
+  const newMem={
+    id:members.length+1,name,phone,
+    grade:document.getElementById('nm-grade').value||'—',
+    cls:document.getElementById('nm-cls').value,
+    ticket:document.getElementById('nm-ticket').value,
+    amount:0,days:document.getElementById('nm-days').value||'—',
+    expire:addDays(TODAY,30),paid:false,status:'active',
+    src:document.getElementById('nm-src').value,
+    memo:document.getElementById('nm-memo').value,
+    attRate:100,avaBg:avaBg[ci],avaFg:avaFg[ci],
+  };
+  // DB 저장
+  const saved = await saveMemberToDB(newMem);
+  if(saved) newMem.id = saved.id;
+  members.push(newMem);
+  closeM('addMem');
+  document.getElementById('sbTotal').textContent=members.length;
+  document.getElementById('ds-tot').textContent=members.length;
+  document.getElementById('chipAll').textContent=members.length;
+  renderAttSelect();
+  ['nm-name','nm-phone','nm-grade','nm-days','nm-memo'].forEach(id=>document.getElementById(id).value='');
+  toast(`🌸 ${name} 등록 완료! DB 저장 + 웰컴 카카오 자동 발송 ✨`);
+  renderDash();
+}
+
+function batchExpire(){
+  const exp=members.filter(m=>m.status==='expire');
+  toast(`💬 만료 임박 ${exp.length}명 학부모님께 재등록 안내 발송 완료!`);
+  go('expire');
+}
+function quickKK(name){
+  document.getElementById('kkMsg').value=`안녕하세요 🩰 Mary in Ballet입니다!\n\n${name} 학부모님, 안내드립니다.\n\n[내용 입력]\n\n문의 · 010-7583-1743`;
+  refreshKK();go('kakao');toast('💬 메시지 작성 창 오픈!');
+}
+function doSearch(q){
+  // 검색어 없으면 전체 목록 복원
+  if(!q.trim()){
+    memPage=1;
+    renderMemTable();
+    return;
+  }
+  // 회원 관리 탭으로 이동
+  go('members');
+  // 이름·연락처·수업반·학년·메모 검색
+  const f = members.filter(m =>
+    (m.name   && m.name.includes(q))   ||
+    (m.phone  && m.phone.includes(q))  ||
+    (m.cls    && m.cls.includes(q))    ||
+    (m.grade  && m.grade.includes(q))  ||
+    (m.memo   && m.memo.includes(q))
+  );
+  document.getElementById('memBody').innerHTML = f.length ? f.map(m=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:7px">
+      <div class="ava" style="background:${m.avaBg};color:${m.avaFg};border-color:${m.avaFg}22">${m.name[0]}</div>
+      <div><div style="font-weight:500;font-size:12.5px">${m.name}</div><div style="font-size:10px;color:var(--muted)">${m.phone||'—'}</div></div>
+    </div></td>
+    <td style="font-size:11.5px">${m.grade}</td>
+    <td><span class="tag ${tagCls[m.cls]||'t-ki'}">${m.cls}</span></td>
+    <td style="font-size:11px;color:var(--muted)">${m.ticket}</td>
+    <td style="font-size:11.5px">${fmtDate(m.expire)}</td>
+    <td><span class="pill ${dday(m.expire)<=7?'pr':dday(m.expire)<=14?'pw':'pg'}">${dday(m.expire)<=30?'D-'+dday(m.expire):'—'}</span></td>
+    <td>${m.paid?`<span class="pill pg">납부</span>`:`<span class="pill pr">미납</span>`}</td>
+    <td style="font-size:10.5px;color:var(--muted)">${m.src}</td>
+    <td><span class="dot ${dotCls[m.status]}"></span> <span style="font-size:11px">${stLbl[m.status]}</span></td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn bo bs" onclick="openDetail(${m.id})">상세</button>
+      <button class="btn bo bs" onclick="quickKK('${m.name}')">💬</button>
+    </div></td>
+  </tr>`).join('')
+  : `<tr><td colspan="10" style="text-align:center;padding:30px;color:var(--muted);font-size:12px">"${q}" 검색 결과가 없어요</td></tr>`;
+  document.getElementById('memPager').innerHTML=`<span class="page-info">검색 결과 ${f.length}명</span>`;
+}
+function exportCSV(){
+  const rows=['이름,학년,연락처,수업반,수강권,만료일,납부,상태,유입',...members.map(m=>`${m.name},${m.grade},${m.phone||''},${m.cls},${m.ticket},${m.expire},${m.paid?'납부':'미납'},${m.status},${m.src}`)].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+rows],{type:'text/csv;charset=utf-8'}));
+  a.download='Mary_in_Ballet_마두점_회원.csv';a.click();
+  toast('📥 CSV 다운로드!');
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+async function init() {
+  // DB에서 회원 불러오기 시도
+  const loaded = await loadMembersFromDB();
+  if(loaded) {
+    toast('✅ DB에서 ' + members.length + '명 불러왔어요!');
+  }
+  renderDash();
+  renderAttSelect();
+  refreshKK();
+  // 실시간 구독 시작
+  subscribeMembers();
+}
+init();
+</script>
+</body>
+</html>
