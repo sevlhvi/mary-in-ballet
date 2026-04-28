@@ -2129,38 +2129,193 @@ function openDetail(id){
   document.getElementById('detailContent').innerHTML=`
     <div style="background:linear-gradient(135deg,var(--ink) 0%,#2d2020 100%);border-radius:var(--r2) var(--r2) 0 0;padding:18px 22px;color:#fff;position:relative;overflow:hidden">
       <div style="position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:50px;opacity:.06">🩰</div>
-      <button class="mh-x" style="position:absolute;top:14px;right:14px" onclick="closeM('detail')">✕</button>
+      <button class="mh-x" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)" onclick="closeM('detail')">✕</button>
       <div style="font-family:'Gowun Batang',serif;font-size:20px;color:var(--gold)">${m.name}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;display:flex;gap:12px">
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;display:flex;gap:12px;flex-wrap:wrap">
         <span>${m.grade}</span><span>${m.cls}</span><span>${m.src}</span>
         ${m.phone?`<span>${m.phone}</span>`:''}
       </div>
     </div>
-    <div class="mb">
+
+    <!-- 탭 -->
+    <div style="display:flex;border-bottom:1px solid var(--bdr);background:var(--surf2)">
+      <div id="dtab-view" onclick="switchDetailTab('view')"
+        style="padding:10px 18px;font-size:12px;cursor:pointer;border-bottom:2px solid var(--rose);color:var(--rose);font-weight:500">
+        📋 정보 보기
+      </div>
+      <div id="dtab-edit" onclick="switchDetailTab('edit')"
+        style="padding:10px 18px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted)">
+        ✏️ 정보 수정
+      </div>
+    </div>
+
+    <!-- 보기 탭 -->
+    <div id="dpane-view" class="mb">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px">
         ${[
+          ['이름',m.name],
+          ['연락처',m.phone||'—'],
+          ['학년',m.grade||'—'],
+          ['수업반',m.cls],
           ['수강권',m.ticket],
           ['수강 요일',m.days||'—'],
           ['만료일',fmtDate(m.expire)],
-          ['D-Day',dday(m.expire)<=30?`D-${dday(m.expire)}`:'—'],
-          ['납부 상태',m.paid?`<span class="pill pg">납부완료</span>`:`<span class="pill pr">미납</span>`],
-          ['이번달 출석률',`<span style="color:var(--rose);font-weight:600">${m.attRate}%</span>`],
+          ['D-Day',dday(m.expire)<=30?'D-'+dday(m.expire):'—'],
+          ['납부 상태',m.paid?'<span class="pill pg">납부완료</span>':'<span class="pill pr">미납</span>'],
+          ['출석률','<span style="color:var(--rose);font-weight:600">'+m.attRate+'%</span>'],
+          ['유입 경로',m.src||'—'],
+          ['금액',m.amount?m.amount.toLocaleString()+'원':'—'],
         ].map(([l,v])=>`<div style="background:var(--surf2);border-radius:var(--r);padding:10px 12px">
           <div class="fl" style="margin-bottom:3px">${l}</div>
-          <div style="font-size:12.5px">${v}</div>
+          <div style="font-size:12px">${v}</div>
         </div>`).join('')}
       </div>
-      ${m.memo?`<div style="background:var(--goldL);border-radius:var(--r);padding:9px 12px;font-size:11.5px;margin-bottom:12px"><b>메모:</b> ${m.memo}</div>`:''}
+      ${m.memo?`<div style="background:var(--goldL);border-radius:var(--r);padding:9px 12px;font-size:11.5px;margin-bottom:12px">
+        <b>메모:</b> ${m.memo}
+      </div>`:''}
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn bo bs" onclick="closeM('detail');quickKK('${m.name}')">💬 카카오 발송</button>
-        <button class="btn bo bs" onclick="toast('수강권 변경!')">수강권 변경</button>
-        <button class="btn bo bs" onclick="go('attend')">출석 이력</button>
-        <button class="btn bo bs" style="margin-left:auto;color:var(--warn);border-color:rgba(200,126,66,.4)" onclick="toast('일시정지 처리됨')">일시정지</button>
-        <button class="btn bo bs" style="color:var(--red);border-color:var(--redL)" onclick="if(confirm('탈퇴 처리하시겠어요?')){closeM('detail');toast('탈퇴 처리됨')}">탈퇴</button>
+        <button class="btn bo bs" onclick="switchDetailTab('edit')">✏️ 정보 수정</button>
+        <button class="btn bo bs" style="margin-left:auto;color:var(--warn);border-color:rgba(200,126,66,.4)"
+          onclick="pauseMember(${m.id})">일시정지</button>
+        <button class="btn bo bs" style="color:var(--red);border-color:var(--redL)"
+          onclick="deleteMember(${m.id})">탈퇴</button>
       </div>
     </div>
-    <div class="mf"><button class="btn bo" onclick="closeM('detail')">닫기</button><button class="btn bp" onclick="toast('✅ 저장됨');closeM('detail')">저장</button></div>`;
+
+    <!-- 수정 탭 -->
+    <div id="dpane-edit" class="mb" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label class="fl">이름</label>
+          <input class="fi" id="edit-name" value="${m.name}"></div>
+        <div class="fg"><label class="fl">연락처</label>
+          <input class="fi" id="edit-phone" value="${m.phone||''}"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label class="fl">학년</label>
+          <input class="fi" id="edit-grade" value="${m.grade||''}"></div>
+        <div class="fg"><label class="fl">수업반</label>
+          <select class="fs" id="edit-cls">
+            ${['쁘띠바발레(유아)','쁘띠바발레 토요','초등발레 L0.5 오후','초등발레 L0.5 저녁','초등발레 L0.5 토요','콩쿨반','발레 기본 2레벨','발레 심화 3레벨','발레 스트레칭','현대무용','1:1 Private']
+              .map(cls=>`<option value="${cls}" ${m.cls===cls?'selected':''}>${cls}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><label class="fl">수강 요일</label>
+          <input class="fi" id="edit-days" value="${m.days||''}"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label class="fl">수강권</label>
+          <select class="fs" id="edit-ticket">
+            ${['1레벨 주1회(4주)','1레벨 주2회(4주)','1레벨 주3회(4주)','1레벨 주1회(3개월)','1레벨 주2회(3개월)','1레벨 주3회(3개월)','2레벨 주1회(4주)','2레벨 주2회(4주)','2레벨 주1회(3개월)','2레벨 주2회(3개월)','3레벨 주1회(4주)','3레벨 주2회(4주)','3레벨 주3회(4주)','3레벨 주1회(3개월)','3레벨 주2회(3개월)','3레벨 주3회(3개월)','체험 1회']
+              .map(t=>`<option value="${t}" ${m.ticket===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><label class="fl">만료일</label>
+          <input class="fi" id="edit-expire" value="${m.expire||''}"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label class="fl">납부 상태</label>
+          <select class="fs" id="edit-paid">
+            <option value="true" ${m.paid?'selected':''}>납부완료</option>
+            <option value="false" ${!m.paid?'selected':''}>미납</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">상태</label>
+          <select class="fs" id="edit-status">
+            <option value="active" ${m.status==='active'?'selected':''}>활성</option>
+            <option value="expire" ${m.status==='expire'?'selected':''}>만료임박</option>
+            <option value="pause"  ${m.status==='pause'?'selected':''}>일시정지</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label class="fl">메모</label>
+        <textarea class="fta" id="edit-memo" style="min-height:55px">${m.memo||''}</textarea>
+      </div>
+      <div style="background:var(--sageL);border-radius:var(--r);padding:8px 12px;font-size:11px;color:#2d6040">
+        ✅ 저장하면 DB에도 즉시 반영되고 선생님 화면에도 업데이트됩니다.
+      </div>
+    </div>
+
+    <div class="mf">
+      <button class="btn bo" onclick="closeM('detail')">닫기</button>
+      <button class="btn bp" id="detailSaveBtn" onclick="saveDetail(${m.id})">저장</button>
+    </div>`;
+
   openM('detail');
+}
+
+function switchDetailTab(tab){
+  document.getElementById('dtab-view').style.borderBottomColor = tab==='view'?'var(--rose)':'transparent';
+  document.getElementById('dtab-view').style.color = tab==='view'?'var(--rose)':'var(--muted)';
+  document.getElementById('dtab-edit').style.borderBottomColor = tab==='edit'?'var(--rose)':'transparent';
+  document.getElementById('dtab-edit').style.color = tab==='edit'?'var(--rose)':'var(--muted)';
+  document.getElementById('dpane-view').style.display = tab==='view'?'block':'none';
+  document.getElementById('dpane-edit').style.display = tab==='edit'?'block':'none';
+  const btn = document.getElementById('detailSaveBtn');
+  if(btn) btn.style.display = tab==='edit'?'inline-flex':'none';
+}
+
+async function saveDetail(id){
+  const m = members.find(x=>x.id===id);
+  if(!m) return;
+
+  const updated = {
+    name:   document.getElementById('edit-name').value.trim(),
+    phone:  document.getElementById('edit-phone').value.trim(),
+    grade:  document.getElementById('edit-grade').value.trim(),
+    cls:    document.getElementById('edit-cls').value,
+    ticket: document.getElementById('edit-ticket').value,
+    days:   document.getElementById('edit-days').value.trim(),
+    expire: document.getElementById('edit-expire').value.trim(),
+    paid:   document.getElementById('edit-paid').value === 'true',
+    status: document.getElementById('edit-status').value,
+    memo:   document.getElementById('edit-memo').value.trim(),
+  };
+
+  if(!updated.name){ toast('⚠ 이름을 입력해주세요'); return; }
+
+  // 로컬 업데이트
+  Object.assign(m, updated);
+
+  // DB 업데이트
+  const dbFields = {
+    name: updated.name, phone: updated.phone, grade: updated.grade,
+    cls: updated.cls, ticket: updated.ticket, days: updated.days,
+    expire: updated.expire, paid: updated.paid, status: updated.status,
+    memo: updated.memo,
+  };
+  const ok = await updateMemberInDB(id, dbFields);
+
+  closeM('detail');
+  renderDash();
+  renderMemTable();
+  renderExpire();
+
+  if(ok) toast('✅ ' + updated.name + ' 정보가 저장됐어요! DB 반영 완료');
+  else   toast('⚠ 로컬 저장됨 (DB 저장 실패 — 인터넷 확인)');
+}
+
+async function pauseMember(id){
+  const m = members.find(x=>x.id===id);
+  if(!m) return;
+  m.status = m.status==='pause' ? 'active' : 'pause';
+  await updateMemberInDB(id, { status: m.status });
+  closeM('detail');
+  renderDash(); renderMemTable();
+  toast(m.status==='pause' ? '⏸ 일시정지 처리됨' : '▶ 활성화됨');
+}
+
+async function deleteMember(id){
+  if(!confirm('정말 탈퇴 처리하시겠어요?')) return;
+  const m = members.find(x=>x.id===id);
+  await deleteMemberFromDB(id);
+  const idx = members.findIndex(x=>x.id===id);
+  if(idx>=0) members.splice(idx,1);
+  closeM('detail');
+  renderDash(); renderMemTable();
+  document.getElementById('sbTotal').textContent = members.length;
+  document.getElementById('ds-tot').textContent  = members.length;
+  toast('🗑 ' + (m?m.name:'회원') + ' 탈퇴 처리 완료');
 }
 
 // ═══════════════════════════════════════════
