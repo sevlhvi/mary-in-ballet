@@ -754,15 +754,15 @@ body{
     <!-- MEMBERS -->
     <div class="page" id="pg-members">
       <div class="chip-bar" id="memChips">
-        <span class="chip on" data-f="all">전체 <span id="chipAll">16</span>명</span>
-        <span class="chip" data-f="쁘띠바발레">쁘띠바발레</span>
-        <span class="chip" data-f="초등발레">초등발레</span>
-        <span class="chip" data-f="콩쿨반">콩쿨반</span>
-        <span class="chip" data-f="2레벨">2레벨</span>
-        <span class="chip" data-f="3레벨">3레벨</span>
-        <span class="chip" data-f="현대무용">현대무용</span>
-        <span class="chip" data-f="expire" style="color:var(--warn)">⚠ 만료임박</span>
-        <span class="chip" data-f="unpaid" style="color:var(--red)">💰 미납</span>
+        <span class="chip on" data-f="all">전체 <span id="chipAll">0</span>명</span>
+        <span class="chip" data-f="쁘띠바발레">쁘띠바발레 <span id="chip-유아">0</span></span>
+        <span class="chip" data-f="초등발레">초등발레 <span id="chip-초등">0</span></span>
+        <span class="chip" data-f="콩쿨반">콩쿨반 <span id="chip-콩쿨">0</span></span>
+        <span class="chip" data-f="2레벨">2레벨 <span id="chip-2레벨">0</span></span>
+        <span class="chip" data-f="3레벨">3레벨 <span id="chip-3레벨">0</span></span>
+        <span class="chip" data-f="현대무용">현대무용 <span id="chip-현대">0</span></span>
+        <span class="chip" data-f="expire" style="color:var(--warn)">⚠ 만료임박 <span id="chip-expire">0</span></span>
+        <span class="chip" data-f="unpaid" style="color:var(--red)">💰 미납 <span id="chip-unpaid">0</span></span>
       </div>
       <div class="card">
         <div class="ch">
@@ -1621,6 +1621,33 @@ function renderPager(id,cur,total,count,fn){
 // ═══════════════════════════════════════════
 //  RENDER: DASHBOARD
 // ═══════════════════════════════════════════
+function updateChipCounts(){
+  const total  = members.length;
+  const yua    = members.filter(m=>m.cls.includes('쁘띠바')||m.cls.includes('유아')).length;
+  const cho    = members.filter(m=>m.cls.includes('초등')).length;
+  const kong   = members.filter(m=>m.cls.includes('콩쿨')).length;
+  const lv2    = members.filter(m=>m.cls.includes('2레벨')).length;
+  const lv3    = members.filter(m=>m.cls.includes('3레벨')).length;
+  const md     = members.filter(m=>m.cls.includes('현대')).length;
+  const exp    = members.filter(m=>m.status==='expire'||dday(m.expire)<=7).length;
+  const unpaid = members.filter(m=>!m.paid).length;
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val||''; };
+  set('chipAll',   total);
+  set('chip-유아',  yua  || '');
+  set('chip-초등',  cho  || '');
+  set('chip-콩쿨',  kong || '');
+  set('chip-2레벨', lv2  || '');
+  set('chip-3레벨', lv3  || '');
+  set('chip-현대',  md   || '');
+  set('chip-expire',exp  || '');
+  set('chip-unpaid',unpaid||'');
+
+  // ds-tot, sbTotal도 같이
+  const dt=document.getElementById('ds-tot'); if(dt) dt.textContent=total;
+  const st=document.getElementById('sbTotal'); if(st) st.textContent=total;
+}
+
 function renderDash(){
   const expire=members.filter(m=>m.status==='expire');
   document.getElementById('ds-tot').textContent=members.length;
@@ -1628,6 +1655,7 @@ function renderDash(){
   document.getElementById('sbTotal').textContent=members.length;
   document.getElementById('sbExp').textContent=expire.length;
   document.getElementById('sbUnpaid').textContent=members.filter(m=>!m.paid).length;
+  updateChipCounts();
 
   // 회원 테이블 (전체)
   document.getElementById('dashTbl').innerHTML=`
