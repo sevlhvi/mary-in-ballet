@@ -621,6 +621,7 @@ body{
   color:var(--gold);box-shadow:0 1px 6px rgba(30,24,16,.3);
 }
 .a-future{background:var(--cream2);color:var(--dust);pointer-events:none}
+.a-holiday{background:var(--roseLL);color:var(--rose);opacity:.6}
 
 /* ── SCHEDULE EVENTS ──────────────────────────── */
 .sch-event{
@@ -674,8 +675,8 @@ body{
     <div class="sb-a" data-pg="payment"><span class="ico">◇</span>수강료 정산 <span class="sb-badge w" id="sbUnpaid">1</span></div>
     <div class="sb-a" data-pg="analytics"><span class="ico">📊</span>매출 분석</div>
   </nav>
-  <div class="sb-today">
-    <div class="sb-today-lbl">오늘 수업 · 수요일</div>
+  <div class="sb-today" id="sbTodayWrap">
+    <div class="sb-today-lbl" id="sbTodayLbl">오늘 수업</div>
     <div class="sb-today-item"><span class="dot"></span>발레 스트레칭 9:00</div>
     <div class="sb-today-item"><span class="dot"></span>현대무용 14:00 (박소유)</div>
     <div class="sb-today-item"><span class="dot"></span>초등발레 L0.5 오후 15:30</div>
@@ -1391,7 +1392,46 @@ function subscribeMembers() {
 // ═══════════════════════════════════════════
 //  실제 회원 데이터 (메리인발레 마두점)
 // ═══════════════════════════════════════════
-const TODAY = '2026-03-02';
+// ── 오늘 날짜 (항상 실제 날짜 자동 반영) ────────────────
+const _now = new Date();
+const TODAY = _now.getFullYear() + '-' +
+  String(_now.getMonth()+1).padStart(2,'0') + '-' +
+  String(_now.getDate()).padStart(2,'0');
+
+// ── 휴무일 설정 ───────────────────────────────────────────
+// 형식: 'YYYY-MM-DD' 또는 'MM-DD' (매년 반복)
+const HOLIDAYS = {
+  // 공휴일 (매년 반복 — MM-DD 형식)
+  recurring: [
+    '01-01', // 신정
+    '03-01', // 삼일절
+    '05-05', // 어린이날
+    '06-06', // 현충일
+    '08-15', // 광복절
+    '10-03', // 개천절
+    '10-09', // 한글날
+    '12-25', // 크리스마스
+  ],
+  // 특정 날짜 휴무 (YYYY-MM-DD 형식)
+  specific: [
+    // 예: '2026-05-01', // 근로자의 날
+    // 예: '2026-07-25', // 여름 방학
+  ],
+  // 설날·추석 연휴 (매년 다르므로 직접 입력)
+  lunar: [
+    '2026-01-28','2026-01-29','2026-01-30', // 설날 연휴
+    '2026-10-05','2026-10-06','2026-10-07', // 추석 연휴
+  ],
+};
+
+function isHoliday(dateStr) {
+  if(!dateStr || dateStr === '—') return false;
+  var mmdd = dateStr.slice(5); // MM-DD
+  if(HOLIDAYS.recurring.indexOf(mmdd) !== -1) return true;
+  if(HOLIDAYS.specific.indexOf(dateStr) !== -1) return true;
+  if(HOLIDAYS.lunar.indexOf(dateStr) !== -1) return true;
+  return false;
+}
 
 const avaBg = ['#f5ddd5','#d5e8f5','#d5f0de','#f5ebd5','#e8d5f5','#d5eeee'];
 const avaFg = ['#8c3020','#204878','#3a7040','#8c5018','#582a8c','#2a6060'];
@@ -1733,7 +1773,7 @@ function renderCal(){
   const mid   = selEl.value || (members[0]&&members[0].id);
 
   // 오늘 날짜
-  const todayDate = new Date(TODAY);
+  const todayDate = new Date();  // 항상 실제 오늘
   const isCurrentMonth = (todayDate.getFullYear()===year && todayDate.getMonth()+1===month);
   const todayDay = isCurrentMonth ? todayDate.getDate() : -1;
 
@@ -1798,7 +1838,7 @@ function renderCal(){
 }
 
 function togAtt(el, d, year, month, mid){
-  const todayDate = new Date(TODAY);
+  const todayDate = new Date();  // 항상 실제 오늘
   const isCurrentMonth = (todayDate.getFullYear()===year && todayDate.getMonth()+1===month);
   const todayDay = isCurrentMonth ? todayDate.getDate() : -1;
   const isFuture = (year > todayDate.getFullYear()) ||
@@ -2766,7 +2806,26 @@ function exportCSV(){
 // ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
+function updateSidebarToday() {
+  const days = ['일','월','화','수','목','금','토'];
+  const now = new Date();
+  const dayName = days[now.getDay()];
+  const lbl = document.getElementById('sbTodayLbl');
+  if(lbl) lbl.textContent = '오늘 수업 · ' + dayName + '요일';
+
+  // 오늘이 휴무일이면 안내
+  const todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  if(isHoliday(todayStr)) {
+    const wrap = document.getElementById('sbTodayWrap');
+    if(wrap) wrap.style.borderColor = 'rgba(168,97,74,.3)';
+    const lbl2 = document.getElementById('sbTodayLbl');
+    if(lbl2) lbl2.textContent = '🗓 오늘은 휴무일';
+  }
+}
+
 async function init() {
+  // 오늘 날짜 사이드바 업데이트
+  updateSidebarToday();
   // DB에서 회원 불러오기 시도
   const loaded = await loadMembersFromDB();
   if(loaded) {
@@ -2777,6 +2836,11 @@ async function init() {
   refreshKK();
   // 실시간 구독 시작
   subscribeMembers();
+  // 자정에 날짜 자동 갱신
+  const msUntilMidnight = new Date().setHours(24,0,0,0) - Date.now();
+  setTimeout(() => {
+    location.reload(); // 자정에 페이지 새로고침으로 날짜 갱신
+  }, msUntilMidnight);
 }
 init();
 </script>
