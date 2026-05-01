@@ -662,7 +662,7 @@ body{
     <div class="sb-a on" data-pg="dash"><span class="ico">✦</span>홈 대시보드</div>
     <div class="sb-a" data-pg="attend"><span class="ico">◉</span>출석 체크</div>
     <div class="sb-sec">회원</div>
-    <div class="sb-a" data-pg="members"><span class="ico">◎</span>회원 관리 <span class="sb-badge gr" id="sbTotal">16</span></div>
+    <div class="sb-a" data-pg="members"><span class="ico">◎</span>회원 관리 <span class="sb-badge gr" id="sbTotal">29</span></div>
     <div class="sb-a" data-pg="expire"><span class="ico">⏰</span>만료 임박 <span class="sb-badge w" id="sbExp">4</span></div>
     <div class="sb-sec">수업</div>
     <div class="sb-a" data-pg="schedule"><span class="ico">◈</span>수업 스케줄</div>
@@ -719,7 +719,7 @@ body{
         <div class="qa-btn" onclick="openM('addMem')"><div class="qa-ic">🌸</div><div class="qa-t">신규 등록<br>+ 웰컴 자동</div><div class="qa-s">카카오 자동 발송</div></div>
       </div>
       <div class="stat-grid c4">
-        <div class="stat-tile st-rose"><div class="sl">전체 회원</div><div class="sv" id="ds-tot">16</div><div class="sh2">수강생 16명 (수업 등록 20건)</div></div>
+        <div class="stat-tile st-rose"><div class="sl">전체 회원</div><div class="sv" id="ds-tot">29</div><div class="sh2">수강생 16명 (수업 등록 20건)</div></div>
         <div class="stat-tile st-gold"><div class="sl">이번달 수강료</div><div class="sv">4.1<span>M</span></div><div class="sh2"><span class="pill pg">납부 15명</span></div></div>
         <div class="stat-tile st-warn"><div class="sl">만료 임박 (7일)</div><div class="sv" id="ds-exp">4</div><div class="sh2"><span class="pill pw">즉시 알림 필요</span></div></div>
         <div class="stat-tile st-sage"><div class="sl">이번달 출석률</div><div class="sv">91<span>%</span></div><div class="sh2"><span class="pill pg">전반적 양호</span></div></div>
@@ -1414,7 +1414,9 @@ const HOLIDAYS = {
   ],
   // 특정 날짜 휴무 (YYYY-MM-DD 형식)
   specific: [
-    // 예: '2026-05-01', // 근로자의 날
+    '2026-05-01', // 근로자의 날 (노동절)
+    '2026-05-24', // 석가탄신일
+    // 추가 휴무일을 여기에 입력하세요
     // 예: '2026-07-25', // 여름 방학
   ],
   // 설날·추석 연휴 (매년 다르므로 직접 입력)
@@ -1449,26 +1451,35 @@ const dotCls = {active:'d-on',expire:'d-warn',pause:'d-off'};
 const stLbl  = {active:'활성',expire:'만료임박',pause:'일시정지'};
 
 let members = [
-  // ── 초등발레 ─────────────────────────────────────────────
-  {id:1,  name:'박영은', phone:'010-2575-3712', grade:'1학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'월·수', expire:'2026-03-22', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:90, avaBg:avaBg[0],avaFg:avaFg[0]},
-  {id:2,  name:'박나현', phone:'010-9482-0807', grade:'1학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'수·금', expire:'2026-03-20', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:85, avaBg:avaBg[1],avaFg:avaFg[1]},
-  {id:3,  name:'박소유', phone:'010-2960-4003', grade:'2학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'수',   expire:'2026-03-25', paid:true,  status:'active', src:'기존',    memo:'현대무용 병행 수강',       attRate:88, avaBg:avaBg[2],avaFg:avaFg[2]},
-  {id:4,  name:'김소예', phone:'010-4468-1015', grade:'2학년', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:92, avaBg:avaBg[3],avaFg:avaFg[3]},
-  {id:5,  name:'이승희', phone:'010-9055-2719', grade:'3학년', cls:'초등발레 L0.5 저녁', ticket:'1레벨 주2회(4주)',  amount:180000, days:'월·수', expire:'2026-03-05', paid:true,  status:'expire', src:'기존',    memo:'1day 결제 완료',           attRate:80, avaBg:avaBg[4],avaFg:avaFg[4]},
-  // ── 쁘띠바발레(유아) ──────────────────────────────────────
-  {id:6,  name:'김제아', phone:'010-4447-7252', grade:'유아',  cls:'쁘띠바발레(유아)',   ticket:'1레벨 주2회(4주)',  amount:180000, days:'화·목', expire:'2026-03-28', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:95, avaBg:avaBg[5],avaFg:avaFg[5]},
-  {id:7,  name:'이윤슬', phone:'010-8569-0232', grade:'7세',   cls:'쁘띠바발레(유아)',   ticket:'1레벨 주1회(4주)',  amount:110000, days:'목',   expire:'2026-03-10', paid:true,  status:'expire', src:'신규',    memo:'1day 결제 완료',           attRate:100,avaBg:avaBg[0],avaFg:avaFg[0]},
-  // ── 콩쿨반 · 3레벨 ───────────────────────────────────────
-  {id:8,  name:'이도아', phone:'',              grade:'4학년', cls:'콩쿨반',            ticket:'3레벨 주3회(4주)',  amount:450000, days:'월·수·금·토', expire:'2026-04-10', paid:true,  status:'active', src:'메리',    memo:'3레벨 병행 수강',          attRate:98, avaBg:avaBg[1],avaFg:avaFg[1]},
-  {id:9,  name:'박정현', phone:'',              grade:'3학년', cls:'콩쿨반',            ticket:'3레벨 주3회(4주)',  amount:450000, days:'월·수·금·토', expire:'2026-04-10', paid:true,  status:'active', src:'메리',    memo:'3레벨 병행 수강',          attRate:96, avaBg:avaBg[2],avaFg:avaFg[2]},
-  {id:10, name:'양새미', phone:'010-2314-0301', grade:'6학년', cls:'발레 심화 3레벨',   ticket:'3레벨 주3회(4주)',  amount:450000, days:'월·수·금', expire:'2026-03-08', paid:false, status:'expire', src:'메리/기존', memo:'1day 미결 320,000원',     attRate:90, avaBg:avaBg[3],avaFg:avaFg[3]},
-  // ── 발레 기본 2레벨 ──────────────────────────────────────
-  {id:11, name:'김서아', phone:'010-9029-0428', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-30', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:91, avaBg:avaBg[4],avaFg:avaFg[4]},
-  {id:12, name:'김수지', phone:'010-6538-4565', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-30', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:87, avaBg:avaBg[5],avaFg:avaFg[5]},
-  {id:13, name:'정민채', phone:'010-9597-0323', grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-07', paid:true,  status:'expire', src:'기존',    memo:'1day 결제 완료',           attRate:83, avaBg:avaBg[0],avaFg:avaFg[0]},
-  {id:14, name:'강하은', phone:'010-9174-2466', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주1회(4주)',  amount:150000, days:'화', expire:'2026-05-12', paid:true,  status:'active', src:'기존',    memo:'시작일 4/14',                         attRate:94, avaBg:avaBg[1],avaFg:avaFg[1]},
-  {id:15, name:'장시은', phone:'',              grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주1회(4주)',  amount:150000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'메리',    memo:'',                         attRate:89, avaBg:avaBg[2],avaFg:avaFg[2]},
-  {id:16, name:'신유아', phone:'',              grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'메리',    memo:'',                         attRate:92, avaBg:avaBg[3],avaFg:avaFg[3]},
+  {id:1, name:'김해나', phone:'010-8945-6389', grade:'초등학교 1학년', cls:'초등발레 L0.5', ticket:'1레벨 주2회(4주)', amount:162000, days:'월/수 13:10', expire:'2026-05-12', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[0], avaFg:avaFg[0]},
+  {id:2, name:'박나현', phone:'010-9482-0807', grade:'초등학교 1학년', cls:'초등발레 L0.5', ticket:'1레벨 주3회(4주)', amount:234000, days:'월/수/금 13:10', expire:'2026-05-12', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[1], avaFg:avaFg[1]},
+  {id:3, name:'박소유', phone:'010-2960-4003', grade:'초등학교 2학년', cls:'초등발레+현대무용', ticket:'1레벨 주2회(4주)', amount:162000, days:'월14:00/수13:10', expire:'2026-05-12', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[2], avaFg:avaFg[2]},
+  {id:4, name:'권이수', phone:'010-8539-6889', grade:'—', cls:'쁘띠바발레(유아)', ticket:'1레벨 주1회(3개월)', amount:282000, days:'월 16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[3], avaFg:avaFg[3]},
+  {id:5, name:'김제니', phone:'010-8898-1086', grade:'—', cls:'쁘띠바발레(유아)', ticket:'1레벨 주1회(4주)', amount:99000, days:'월 16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[4], avaFg:avaFg[4]},
+  {id:6, name:'김이현', phone:'010-8578-4620', grade:'초등학교 3학년', cls:'초등발레 L0.5', ticket:'1레벨 주2회(3개월)', amount:461700, days:'화/목 14:40', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[5], avaFg:avaFg[5]},
+  {id:7, name:'김소예', phone:'010-4468-1015', grade:'초등학교 3학년', cls:'초등발레 L0.5', ticket:'1레벨 주2회(4주)', amount:162000, days:'화/목 14:40', expire:'2026-05-13', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[0], avaFg:avaFg[0]},
+  {id:8, name:'이유', phone:'010-5062-2305', grade:'초등학교 3학년', cls:'초등발레 L0.5', ticket:'1레벨 주2회(3개월)', amount:461700, days:'화/목 14:40', expire:'2026-07-13', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[1], avaFg:avaFg[1]},
+  {id:9, name:'김나은', phone:'010-4343-2145', grade:'초등학교 1학년', cls:'초등발레 L0.5', ticket:'1레벨 주2회(3개월)', amount:461700, days:'화14:40/수13:10', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[2], avaFg:avaFg[2]},
+  {id:10, name:'홍채이', phone:'010-8524-7643', grade:'초등학교 1학년', cls:'초등발레 L0.5', ticket:'1레벨 주1회(3개월)', amount:282150, days:'화14:40', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[3], avaFg:avaFg[3]},
+  {id:11, name:'박해온', phone:'010-4905-4140', grade:'6살', cls:'쁘띠바발레(유아)', ticket:'1레벨 주2회(3개월)', amount:461000, days:'화목 16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[4], avaFg:avaFg[4]},
+  {id:12, name:'김제아', phone:'010-4447-7252', grade:'6살', cls:'쁘띠바발레(유아)', ticket:'1레벨 주1회(3개월)', amount:282150, days:'화16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[5], avaFg:avaFg[5]},
+  {id:13, name:'홍지안', phone:'010-8982-5305', grade:'초등학교 1학년', cls:'초등발레 L0.5', ticket:'1레벨 주2회(3개월)', amount:461700, days:'월 수 1:10', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[0], avaFg:avaFg[0]},
+  {id:14, name:'김서아', phone:'010-9029-0428', grade:'초등학교 5학년', cls:'발레 기본 2레벨', ticket:'2레벨 주2회(3개월)', amount:718200, days:'화/목 18:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[1], avaFg:avaFg[1]},
+  {id:15, name:'김수지', phone:'010-6538-4565', grade:'초등학교 4학년', cls:'발레 기본 2레벨', ticket:'2레벨 주2회(3개월)', amount:718200, days:'화/목 18:30', expire:'—', paid:false, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[2], avaFg:avaFg[2]},
+  {id:16, name:'강하은', phone:'010-9174-2466', grade:'초등학교 2학년', cls:'발레 기본 2레벨', ticket:'2레벨 주1회(3개월)', amount:384750, days:'목 18:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[3], avaFg:avaFg[3]},
+  {id:17, name:'정민채', phone:'010-9597-0323', grade:'초등학교 4학년', cls:'발레 기본 2레벨', ticket:'2레벨 주2회(3개월)', amount:718200, days:'화/목 18:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[4], avaFg:avaFg[4]},
+  {id:18, name:'신유아', phone:'010-9345-9123', grade:'초등학교 4학년', cls:'발레 기본 2레벨', ticket:'2레벨 주2회(3개월)', amount:718200, days:'화/목 18:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[5], avaFg:avaFg[5]},
+  {id:19, name:'이해리', phone:'010-8506-1521', grade:'—', cls:'발레 심화 3레벨', ticket:'3레벨 주1회(4주)', amount:0, days:'—', expire:'—', paid:false, status:'active', src:'구글시트', memo:'', attRate:100, avaBg:avaBg[0], avaFg:avaFg[0]},
+  {id:20, name:'이도아', phone:'010-4126-2650', grade:'초등학교 4학년', cls:'발레 심화 3레벨', ticket:'3레벨 주3회(3개월)', amount:0, days:'월/수/금 18:00', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[1], avaFg:avaFg[1]},
+  {id:21, name:'박정현', phone:'010-7739-3810', grade:'초등학교 3학년', cls:'발레 심화 3레벨', ticket:'3레벨 주3회(3개월)', amount:0, days:'월/수/금 18:00', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[2], avaFg:avaFg[2]},
+  {id:22, name:'원하윤', phone:'010-4433-1548', grade:'초등학교 4학년', cls:'현대무용+2레벨', ticket:'2레벨 주2회(4주)', amount:234000, days:'화17:30/목18:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[3], avaFg:avaFg[3]},
+  {id:23, name:'김서우', phone:'010-7313-7383', grade:'7살', cls:'쁘띠바발레(유아)', ticket:'1레벨 주1회(3개월)', amount:299650, days:'목 16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[4], avaFg:avaFg[4]},
+  {id:24, name:'이서은', phone:'010-4115-1910', grade:'7살', cls:'쁘띠바발레(유아)', ticket:'1레벨 주2회(4주)', amount:179500, days:'화/목16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[5], avaFg:avaFg[5]},
+  {id:25, name:'윤이서', phone:'010-9790-4478', grade:'6살', cls:'쁘띠바발레(유아)', ticket:'1레벨 주3회(3개월)', amount:846000, days:'월화금 16:00', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[0], avaFg:avaFg[0]},
+  {id:26, name:'유루이', phone:'010-5258-3646', grade:'—', cls:'쁘띠바발레(유아)', ticket:'1레벨 주1회(3개월)', amount:0, days:'목 16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'', attRate:100, avaBg:avaBg[1], avaFg:avaFg[1]},
+  {id:27, name:'이윤슬', phone:'010-8569-0232', grade:'—', cls:'쁘띠바발레(유아)', ticket:'1레벨 주2회(3개월)', amount:0, days:'화/목 16:30', expire:'—', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[2], avaFg:avaFg[2]},
+  {id:28, name:'고다은', phone:'010-9636-3080', grade:'—', cls:'초등발레 L0.5', ticket:'1레벨 주2회(4주)', amount:0, days:'—', expire:'—', paid:false, status:'active', src:'구글시트', memo:'', attRate:100, avaBg:avaBg[3], avaFg:avaFg[3]},
+  {id:29, name:'박영은', phone:'010-2575-3712', grade:'—', cls:'—', ticket:'—', amount:0, days:'—', expire:'—', paid:false, status:'active', src:'구글시트', memo:'', attRate:100, avaBg:avaBg[4], avaFg:avaFg[4]}
 ];
 
 // ── 수업 데이터 ─────────────────────────────────────────────
@@ -2398,14 +2409,33 @@ function syncFromPaste(){
       ticket:  m.ticket   || (existing ? existing.ticket  : '—'),
       paid:    m.paid !== undefined ? m.paid : (existing ? existing.paid : false),
       grade:   m.grade    || (existing ? existing.grade   : '—'),
-      memo:    m.memo     || (existing ? existing.memo    : ''),
+      memo:    (function() {
+        var base = m.memo || (existing ? existing.memo : '');
+        var sd = m.startDate || '';
+        var isApril = sd.indexOf('2026-04') !== -1 ||
+          (sd.length >= 3 && sd.slice(0,2) === '04') ||
+          (sd.indexOf('4/') === 0);
+        if(isApril && base.indexOf('오픈 10%') === -1) {
+          return base ? base + ' / 오픈 이벤트 10% 할인' : '오픈 이벤트 10% 할인';
+        }
+        return base;
+      })(),
       expire:  expire,
       days:    m.schedule || (existing ? existing.days    : '—'),
       startDate: m.startDate || '',
       remain:  m.remain   || '',
       status:  status,
       src:     existing ? existing.src : '구글시트',
-      amount:  m.amount   || (existing ? existing.amount  : 0),
+      amount:  (function() {
+        var amt = m.amount || (existing ? existing.amount : 0);
+        // 4월 등록 오픈 이벤트 10% 할인 자동 반영
+        var sd = m.startDate || '';
+        if(sd.indexOf('2026-04') !== -1 || sd.indexOf('4/') === 0 ||
+           (sd.length >= 4 && sd.slice(0,2) === '04')) {
+          amt = Math.round(amt * 0.9);
+        }
+        return amt;
+      })(),
       attRate: existing ? existing.attRate : 100,
       avaBg:   existing ? existing.avaBg   : avaBgL[ci],
       avaFg:   existing ? existing.avaFg   : avaFgL[ci],
@@ -2449,7 +2479,7 @@ function renderPayment(){
     <td style="font-weight:500">${p.name}</td>
     <td><span class="tag ${tagCls[p.cls]||'t-ki'}">${p.cls}</span></td>
     <td style="font-size:11px;color:var(--muted)">${p.ticket}</td>
-    <td style="font-weight:600">${(p.amount/10000).toFixed(0)}만원</td>
+    <td style="font-weight:600">${(p.amount/10000).toFixed(1)}만원${p.discount?'<span class="pill pg" style="margin-left:4px;font-size:8.5px">10%↓</span>':''}</td>
     <td style="font-size:11.5px">${p.date}</td>
     <td style="font-size:11.5px">${p.method}</td>
     <td>${p.paid?`<span class="pill pg">납부완료</span>`:`<span class="pill pr">미납</span>`}</td>
