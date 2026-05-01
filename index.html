@@ -1426,8 +1426,8 @@ let members = [
   {id:11, name:'김서아', phone:'010-9029-0428', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-30', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:91, avaBg:avaBg[4],avaFg:avaFg[4]},
   {id:12, name:'김수지', phone:'010-6538-4565', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-30', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:87, avaBg:avaBg[5],avaFg:avaFg[5]},
   {id:13, name:'정민채', phone:'010-9597-0323', grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-03-07', paid:true,  status:'expire', src:'기존',    memo:'1day 결제 완료',           attRate:83, avaBg:avaBg[0],avaFg:avaFg[0]},
-  {id:14, name:'강하은', phone:'010-9174-2466', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-04-05', paid:true,  status:'active', src:'기존',    memo:'',                         attRate:94, avaBg:avaBg[1],avaFg:avaFg[1]},
-  {id:15, name:'장시은', phone:'',              grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'메리',    memo:'',                         attRate:89, avaBg:avaBg[2],avaFg:avaFg[2]},
+  {id:14, name:'강하은', phone:'010-9174-2466', grade:'2학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주1회(4주)',  amount:150000, days:'화', expire:'2026-05-12', paid:true,  status:'active', src:'기존',    memo:'시작일 4/14',                         attRate:94, avaBg:avaBg[1],avaFg:avaFg[1]},
+  {id:15, name:'장시은', phone:'',              grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주1회(4주)',  amount:150000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'메리',    memo:'',                         attRate:89, avaBg:avaBg[2],avaFg:avaFg[2]},
   {id:16, name:'신유아', phone:'',              grade:'4학년', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, days:'화·목', expire:'2026-04-01', paid:true,  status:'active', src:'메리',    memo:'',                         attRate:92, avaBg:avaBg[3],avaFg:avaFg[3]},
 ];
 
@@ -1481,7 +1481,7 @@ const msgHistory = [
 
 // ── 정산 데이터 ─────────────────────────────────────────────
 const paymentsData = [
-  {name:'박영은', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
+  {name:'박영은', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, date:'04.14', method:'계좌이체', paid:true,  nextPay:'05.14'},
   {name:'박나현', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
   {name:'박소유', cls:'초등발레+현대무용',  ticket:'1레벨 주2회(4주)×2', amount:360000, date:'03.02', method:'현금',    paid:true,  nextPay:'04.02'},
   {name:'김소예', cls:'초등발레 L0.5 오후', ticket:'1레벨 주2회(4주)',  amount:180000, date:'03.01', method:'카드',     paid:true,  nextPay:'04.01'},
@@ -1494,7 +1494,7 @@ const paymentsData = [
   {name:'김서아', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
   {name:'김수지', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.02', method:'카드',     paid:true,  nextPay:'04.02'},
   {name:'정민채', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.01', method:'계좌이체', paid:true,  nextPay:'04.01'},
-  {name:'강하은', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.01', method:'카드',     paid:true,  nextPay:'04.01'},
+  {name:'강하은', cls:'발레 기본 2레벨',   ticket:'2레벨 주1회(4주)',  amount:150000, date:'04.14', method:'카드',     paid:true,  nextPay:'05.14'},
   {name:'장시은', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.02', method:'계좌이체', paid:true,  nextPay:'04.02'},
   {name:'신유아', cls:'발레 기본 2레벨',   ticket:'2레벨 주2회(4주)',  amount:280000, date:'03.02', method:'현금',     paid:true,  nextPay:'04.02'},
 ];
@@ -1999,17 +1999,158 @@ document.getElementById('kkTabs').addEventListener('click',e=>{
 // ═══════════════════════════════════════════
 
 const FIELD_MAP = {
-  '성함':'name','이름':'name','성명':'name',
-  '연락처':'phone','전화번호':'phone','전화':'phone',
-  '수업':'cls','수업반':'cls',
-  '수강권':'ticket',
-  '주2회':'days','요일/시간':'schedule','요일':'days',
-  '등록회차':'totalSessions','잔여회차':'remain',
+  '번호':     'seq',
+  '성함':     'name',
+  '이름':     'name',
+  '연락처':   'phone',
+  '전화번호': 'phone',
+  '수강권':   'ticket',    // 예: "2레벨 주1회", "1레벨 주2회(3개월)"
+  '등록회차': 'totalSessions',
+  '잔여회차': 'remain',
   '연장 여부':'extended',
-  '수납상태':'paid','납부여부':'paid','납부':'paid',
-  '만료일':'expire','시작일':'startDate',
-  '학년':'grade','금액':'amount','번호':'seq','메모':'memo',
+  '만료일':   'expire',
+  '수납상태': 'paid',
+  '납부여부': 'paid',
+  '시작일':   'startDate',
+  '요일 /시간': 'schedule',
+  '요일/시간': 'schedule',
+  '요일':     'schedule',
+  '학년':     'grade',
+  '금액':     'amount',
+  '메모':     'memo',
+  '비고':     'memo',
 };
+
+// 수강권 문자열 → 시스템 ticket 키로 정규화
+// 예: "2레벨 주1회" → "2레벨 주1회(4주)"
+//     "1레벨 주2회(3개월)" → "1레벨 주2회(3개월)"
+function normalizeTicket(raw) {
+  if(!raw) return '—';
+  var s = raw.toString().trim();
+
+  // 레벨 추출
+  var level = '';
+  if(s.indexOf('3레벨') !== -1 || s.indexOf('심화') !== -1) level = '3레벨';
+  else if(s.indexOf('2레벨') !== -1 || s.indexOf('기본') !== -1) level = '2레벨';
+  else if(s.indexOf('1레벨') !== -1 || s.indexOf('유아') !== -1 ||
+          s.indexOf('초등') !== -1 || s.indexOf('현대') !== -1) level = '1레벨';
+
+  // 횟수 추출
+  var freq = '';
+  if(s.indexOf('주3회') !== -1) freq = '주3회';
+  else if(s.indexOf('주2회') !== -1) freq = '주2회';
+  else if(s.indexOf('주1회') !== -1) freq = '주1회';
+
+  // 기간 추출
+  var period = s.indexOf('3개월') !== -1 ? '(3개월)' : '(4주)';
+
+  if(level && freq) return level + ' ' + freq + period;
+  return s; // 파싱 못하면 원본 그대로
+}
+
+// 수강권 → 수업반 추정
+function buildCls(rowObj) {
+  var ticket = rowObj['수강권'] || rowObj['ticket'] || '';
+  var schedule = rowObj['요일 /시간'] || rowObj['요일/시간'] || rowObj['schedule'] || '';
+  var t = ticket.toString();
+
+  if(t.indexOf('유아') !== -1 || t.indexOf('쁘띠') !== -1) return '쁘띠바발레(유아)';
+  if(t.indexOf('초등') !== -1) return '초등발레 L0.5 오후';
+  if(t.indexOf('현대') !== -1) return '현대무용';
+  if(t.indexOf('콩쿨') !== -1) return '콩쿨반';
+  if(t.indexOf('3레벨') !== -1 || t.indexOf('심화') !== -1) return '발레 심화 3레벨';
+  if(t.indexOf('2레벨') !== -1 || t.indexOf('기본') !== -1) return '발레 기본 2레벨';
+  if(t.indexOf('1레벨') !== -1) {
+    // 요일/시간으로 유아 vs 초등 구분
+    if(schedule.indexOf('토') !== -1) return '쁘띠바발레 토요';
+    return '초등발레 L0.5 오후';
+  }
+  // 요일/시간으로 추정
+  if(schedule) return schedule;
+  return '—';
+}
+
+// 수납상태 파싱
+function parsePaid(val) {
+  if(!val) return false;
+  var v = val.toString().trim().toLowerCase();
+  if(['미납','x','no','false','0','미완','미결',''].indexOf(v) !== -1) return false;
+  if(['완납','완료','납부','납','y','yes','true','o','1','입금','결제완료'].indexOf(v) !== -1) return true;
+  return false;
+}
+
+// 만료일 파싱 (다양한 형식 처리)
+function parseExpire(val) {
+  if(!val) return '—';
+  var s = val.toString().trim();
+  if(!s || s === '—' || s === '-') return '—';
+
+  // "Tue May 12 2026 16:00:00 GMT+0900" 형식
+  if(s.indexOf('GMT') !== -1) {
+    var d = new Date(s);
+    if(!isNaN(d)) {
+      return d.getFullYear() + '-' +
+        String(d.getMonth()+1).padStart(2,'0') + '-' +
+        String(d.getDate()).padStart(2,'0');
+    }
+  }
+  // "2026-05-12" 형식 → 그대로
+  if(s.match(/^\d{4}-\d{2}-\d{2}$/)) return s;
+  // "5/12" 또는 "05/12" 형식 → 2026년으로 처리
+  var m = s.match(/^(\d{1,2})\/(\d{1,2})$/);
+  if(m) return '2026-' + String(m[1]).padStart(2,'0') + '-' + String(m[2]).padStart(2,'0');
+  // "2026.05.12" 형식
+  var m2 = s.match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
+  if(m2) return m2[1] + '-' + m2[2] + '-' + m2[3];
+
+  return s;
+}
+
+// 금액 파싱 (쉼표, 원 제거)
+function parseAmount(val) {
+  if(!val) return 0;
+  var s = val.toString().replace(/[^0-9]/g, '');
+  return s ? parseInt(s) : 0;
+}
+
+// 시작일 파싱
+function parseStartDate(val) {
+  if(!val) return '';
+  var s = val.toString().trim();
+  // "4/14(화)" → "2026-04-14"
+  var m = s.match(/^(\d{1,2})\/(\d{1,2})/);
+  if(m) return '2026-' + String(m[1]).padStart(2,'0') + '-' + String(m[2]).padStart(2,'0');
+  return s;
+}
+
+// 핵심 매핑 함수
+function mapRow(rowObj) {
+  var mapped = {};
+  var keys = Object.keys(rowObj);
+  for(var k=0; k<keys.length; k++) {
+    var key = keys[k].trim();
+    var field = FIELD_MAP[key];
+    if(field) mapped[field] = rowObj[keys[k]];
+  }
+
+  // 수강권 정규화
+  if(mapped.ticket) mapped.ticket = normalizeTicket(mapped.ticket);
+
+  // 납부상태 → boolean
+  if(mapped.paid !== undefined) mapped.paid = parsePaid(mapped.paid);
+
+  // 만료일 변환
+  if(mapped.expire) mapped.expire = parseExpire(mapped.expire);
+
+  // 금액 변환
+  if(mapped.amount) mapped.amount = parseAmount(mapped.amount);
+
+  // 시작일 변환
+  if(mapped.startDate) mapped.startDate = parseStartDate(mapped.startDate);
+
+  return mapped;
+}
+
 
 function renderGSync(){ /* 붙여넣기 방식은 별도 초기화 불필요 */ }
 
@@ -2177,26 +2318,54 @@ function syncFromPaste(){
   for(var i=0; i<json.members.length; i++){
     var rawRow = json.members[i];
     var m = mapRow(rawRow);
-    if(!m.name) continue;
+    if(!m.name || m.name === '성함') continue; // 헤더행 스킵
     var existing = null;
     for(var x=0; x<members.length; x++){
       if(members[x].name === m.name){ existing = members[x]; break; }
     }
     var ci = i % avaBgL.length;
+
+    // 만료일: 시트값 우선, 없으면 시작일+수강권 기간으로 계산
+    var expire = m.expire || '—';
+    if(expire === '—' && m.startDate) {
+      var days = m.ticket && m.ticket.indexOf('3개월') !== -1 ? 90 : 28;
+      var sd = new Date(m.startDate);
+      if(!isNaN(sd)) {
+        sd.setDate(sd.getDate() + days);
+        expire = sd.getFullYear() + '-' +
+          String(sd.getMonth()+1).padStart(2,'0') + '-' +
+          String(sd.getDate()).padStart(2,'0');
+      }
+    }
+
+    // 상태 결정
+    var status = existing ? existing.status : 'active';
+    if(expire !== '—') {
+      var dd = Math.ceil((new Date(expire) - new Date(TODAY)) / 864e5);
+      if(dd < 0) status = 'expire';
+      else if(dd <= 7) status = 'expire';
+    }
+
+    // 수업반: 기존값 우지 or 시트에서 추정
+    var cls = buildCls(rawRow);
+    if(!cls || cls === '—') cls = existing ? existing.cls : '—';
+
     newList.push({
       id:      existing ? existing.id : members.length+i+100,
-      name:    m.name || '',
-      phone:   m.phone   || (existing ? existing.phone  : ''),
-      cls:     m.cls || buildCls(rawRow) || (existing ? existing.cls : '—'),
-      ticket:  m.ticket  || (existing ? existing.ticket : '—'),
+      name:    m.name,
+      phone:   m.phone    || (existing ? existing.phone   : ''),
+      cls:     cls,
+      ticket:  m.ticket   || (existing ? existing.ticket  : '—'),
       paid:    m.paid !== undefined ? m.paid : (existing ? existing.paid : false),
-      grade:   m.grade   || (existing ? existing.grade  : '—'),
-      memo:    m.memo    || (existing ? existing.memo   : ''),
-      expire:  m.expire  || (existing ? existing.expire : '—'),
-      days:    m.schedule || m.days || (existing ? existing.days : '—'),
-      status:  existing ? existing.status  : 'active',
-      src:     existing ? existing.src     : '구글시트',
-      amount:  m.amount  || (existing ? existing.amount : 0),
+      grade:   m.grade    || (existing ? existing.grade   : '—'),
+      memo:    m.memo     || (existing ? existing.memo    : ''),
+      expire:  expire,
+      days:    m.schedule || (existing ? existing.days    : '—'),
+      startDate: m.startDate || '',
+      remain:  m.remain   || '',
+      status:  status,
+      src:     existing ? existing.src : '구글시트',
+      amount:  m.amount   || (existing ? existing.amount  : 0),
       attRate: existing ? existing.attRate : 100,
       avaBg:   existing ? existing.avaBg   : avaBgL[ci],
       avaFg:   existing ? existing.avaFg   : avaFgL[ci],
