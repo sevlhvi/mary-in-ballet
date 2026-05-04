@@ -1940,7 +1940,7 @@ function renderAttSelect(){
   const monthEl = document.getElementById('attMonth');
   if(monthEl){
     const now = new Date();
-    monthEl.value = now.getMonth()+1;
+    monthEl.value = String(now.getMonth()+1);
   }
 }
 // 출석 데이터 저장소 (회원ID → {년월 → {날짜: 'attend'|'absent'}})
@@ -1954,8 +1954,9 @@ function renderCal(){
   const selEl   = document.getElementById('attSel');
   if(!yearEl||!monthEl||!selEl) return;
 
-  const year  = parseInt(yearEl.value);
-  const month = parseInt(monthEl.value);
+  const _now = new Date();
+  const year  = parseInt(yearEl.value) || _now.getFullYear();
+  const month = parseInt(monthEl.value) || (_now.getMonth()+1);
   const mid   = selEl.value || (members[0]&&members[0].id);
 
   // 오늘 날짜
@@ -1971,20 +1972,7 @@ function renderCal(){
   // 샘플 데이터 (현재월이면 기본값 주입, 나머지는 저장된 값 사용)
   const key = getAttKey(mid, year, month);
   if(!attData[key]){
-    attData[key] = {};
-    if(isCurrentMonth){
-      // 현재월 기본 출석 데이터
-      [1,4,5,6,7,8,11,12,13,14,15,18,19,20,21].forEach(d=>{ if(d<todayDay) attData[key][d]='attend'; });
-      [3,9,10].forEach(d=>{ if(d<todayDay) attData[key][d]='absent'; });
-    } else if(year===2026 && month===2){
-      // 지난달 샘플
-      [1,2,3,4,5,8,9,10,11,15,16,17,18,22,23,24,25].forEach(d=>attData[key][d]='attend');
-      [6,12,19,26].forEach(d=>attData[key][d]='absent');
-    } else if(year===2026 && month===1){
-      [2,3,6,7,8,9,13,14,15,16,20,21,22,23,27,28].forEach(d=>attData[key][d]='attend');
-      [5,12,19].forEach(d=>attData[key][d]='absent');
-    }
-    // 미래달은 빈 데이터
+    attData[key] = {}; // 빈 데이터로 시작 — 직접 클릭해서 출석 입력
   }
 
   const rec = attData[key];
@@ -2020,7 +2008,7 @@ function renderCal(){
 
   // 출석률 텍스트 업데이트
   const attRateText = document.getElementById('attRateText');
-  if(attRateText) attRateText.textContent = `${year}년 ${month}월 출석률`;
+  if(attRateText) attRateText.textContent = year+'년 '+month+'월 출석률';
 }
 
 function togAtt(el, d, year, month, mid){
@@ -2245,6 +2233,12 @@ const FIELD_MAP = {
   '금액':     'amount',
   '메모':     'memo',
   '비고':     'memo',
+  '등록차수': 'round',
+  '차수':     'round',
+  '재등록일': 'reRegDate',
+  '결제방법': 'payMethod',
+  '납부방법': 'payMethod',
+  '할인':     'discount',
 };
 
 // 수강권 문자열 → 시스템 ticket 키로 정규화
@@ -2472,7 +2466,27 @@ function renderGASPreview(rows){
 // 구글 시트 row → enrollment 변환
 function rowToEnrollment(rawRow, member) {
   var m = mapRow(rawRow);
-  var round = parseInt(rawRow['차수'] || rawRow['등록차수'] || '1') || 1;
+  // 등록차수 파싱
+  var roundRaw = rawRow['등록차수'] || rawRow['차수'] || rawRow['등록 차수'] || m.round || '1';
+  var round = parseInt(String(roundRaw).replace(/[^0-9]/g,'')) || 1;
+
+  // 재등록일 파싱 (만료일 없으면 재등록일 사용)
+  var reRegDate = rawRow['재등록일'] || '';
+  var expireDate = m.expire !== '—' ? m.expire : null;
+  if(!expireDate && reRegDate) {
+    expireDate = parseExpire(reRegDate);
+  }
+
+  // 결제방법
+  var payMethod = rawRow['결제방법'] || rawRow['납부방법'] || m.payMethod || null;
+
+  // 할인
+  var discount = rawRow['할인'] || m.discount || null;
+  // 4월 등록이면 오픈 이벤트 자동 표기
+  if(!discount && m.startDate && m.startDate.indexOf('2026-04') !== -1) {
+    discount = '오픈 이벤트 10%';
+  }
+
   return {
     member_id:   member ? member.id : null,
     member_name: m.name || (member ? member.name : ''),
@@ -2480,11 +2494,11 @@ function rowToEnrollment(rawRow, member) {
     cls:         m.cls || buildCls(rawRow),
     ticket:      m.ticket || '—',
     start_date:  m.startDate || null,
-    expire_date: m.expire !== '—' ? m.expire : null,
+    expire_date: expireDate,
     amount:      m.amount || 0,
     paid:        m.paid !== undefined ? m.paid : false,
-    pay_method:  rawRow['결제방법'] || rawRow['납부방법'] || null,
-    discount:    rawRow['할인'] || (m.memo && m.memo.includes('10%') ? '오픈 이벤트 10%' : null),
+    pay_method:  payMethod,
+    discount:    discount,
     att_rate:    rawRow['출석률'] ? parseInt(rawRow['출석률']) : null,
     memo:        m.memo || null,
   };
@@ -2665,7 +2679,9 @@ function syncFromPaste(){
   renderGASPreview(json.members);
 
   // 수강 이력 자동 생성 (시트에 차수 컬럼 있으면 저장)
-  var hasRound = json.members.length && ('차수' in json.members[0] || '등록차수' in json.members[0]);
+  // 차수/등록차수 컬럼 존재 여부 확인
+  var firstRow = json.members[0] || {};
+  var hasRound = '차수' in firstRow || '등록차수' in firstRow || '등록 차수' in firstRow;
   if(hasRound){
     var enrollsToSave = [];
     json.members.forEach(function(rawRow){
@@ -2676,11 +2692,24 @@ function syncFromPaste(){
       if(enroll.member_name) enrollsToSave.push(enroll);
     });
     if(enrollsToSave.length){
-      Promise.all(enrollsToSave.map(function(e){ return saveEnrollment(e); }))
-        .then(function(results){
-          var saved = results.filter(Boolean).length;
-          toast('📋 수강 이력 '+saved+'건 DB 저장 완료!');
+      // 기존 이력 전체 조회 후 중복이면 skip, 신규면 저장
+      loadAllEnrollments().then(function(existing){
+        var toSave = enrollsToSave.filter(function(e){
+          // 같은 member_name + round 가 없을 때만 저장
+          return !existing.some(function(ex){
+            return ex.member_name === e.member_name && ex.round === e.round;
+          });
         });
+        if(!toSave.length){
+          toast('📋 수강 이력 — 이미 최신 상태예요');
+          return;
+        }
+        Promise.all(toSave.map(function(e){ return saveEnrollment(e); }))
+          .then(function(results){
+            var saved = results.filter(Boolean).length;
+            toast('📋 수강 이력 '+saved+'건 새로 저장 완료!');
+          });
+      });
     }
   }
 
