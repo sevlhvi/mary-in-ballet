@@ -668,6 +668,8 @@ body{
     <div class="sb-a" data-pg="schedule"><span class="ico">◈</span>수업 스케줄</div>
     <div class="sb-sec">데이터</div>
     <div class="sb-a" data-pg="gsync"><span class="ico">🔗</span>구글 시트 연동</div>
+    <div class="sb-sec">이력</div>
+    <div class="sb-a" data-pg="history"><span class="ico">📋</span>수강 이력</div>
     <div class="sb-sec">마케팅</div>
     <div class="sb-a" data-pg="kakao"><span class="ico">💬</span>카카오 발송</div>
     <div class="sb-a" data-pg="auto"><span class="ico">⚙</span>자동화 <span class="sb-badge g" id="sbAuto">5</span></div>
@@ -1144,6 +1146,55 @@ body{
 
       </div>
     </div>
+    <!-- HISTORY -->
+    <div class="page" id="pg-history">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;margin-bottom:3px">수강 이력</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:300">모든 등록 기록이 누적 저장됩니다</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <select class="fi bs" id="histFilterMember" style="width:160px" onchange="renderHistory()">
+            <option value="">전체 회원</option>
+          </select>
+          <button class="btn bp" onclick="openM('addEnroll')">+ 재등록 기록</button>
+        </div>
+      </div>
+
+      <!-- 요약 통계 -->
+      <div class="stat-grid c4" style="margin-bottom:18px" id="histStats"></div>
+
+      <!-- 이력 테이블 -->
+      <div class="card">
+        <div class="ch">
+          <span class="ct">전체 수강 이력</span>
+          <div style="display:flex;gap:7px">
+            <button class="btn bo bs" onclick="exportHistoryCSV()">📥 CSV</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="tbl">
+            <thead><tr>
+              <th>회원명</th><th>차수</th><th>수업반</th><th>수강권</th>
+              <th>시작일</th><th>만료일</th><th>금액</th><th>납부</th>
+              <th>결제방법</th><th>출석률</th><th>메모</th><th>등록일시</th><th></th>
+            </tr></thead>
+            <tbody id="histTbody"></tbody>
+          </table>
+        </div>
+        <div class="pager" id="histPager"></div>
+      </div>
+
+      <!-- 회원별 타임라인 -->
+      <div class="card mt" id="histTimeline" style="display:none">
+        <div class="ch">
+          <span class="ct" id="histTimelineTitle">수강 타임라인</span>
+          <button class="btn bo bs" onclick="document.getElementById('histTimeline').style.display='none'">닫기</button>
+        </div>
+        <div class="cb" id="histTimelineBody"></div>
+      </div>
+    </div>
+
     <!-- ANALYTICS -->
     <div class="page" id="pg-analytics">
       <div class="stat-grid c4">
@@ -1340,6 +1391,66 @@ async function updateMemberInDB(id, fields) {
       method: 'PATCH',
       headers: DB_HEADERS,
       body: JSON.stringify(fields)
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+// ── 수강 이력 (enrollments) ─────────────────────────────────
+
+// 특정 회원 이력 조회
+async function loadEnrollments(memberId) {
+  try {
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/enrollments?member_id=eq.' + memberId +
+      '&select=*&order=round.desc', { headers: DB_HEADERS }
+    );
+    if(!res.ok) return [];
+    return await res.json();
+  } catch(e) { return []; }
+}
+
+// 전체 이력 조회
+async function loadAllEnrollments() {
+  try {
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/enrollments?select=*&order=member_id,round.desc',
+      { headers: DB_HEADERS }
+    );
+    if(!res.ok) return [];
+    return await res.json();
+  } catch(e) { return []; }
+}
+
+// 이력 저장
+async function saveEnrollment(enroll) {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/enrollments', {
+      method: 'POST',
+      headers: { ...DB_HEADERS, 'Prefer': 'return=representation' },
+      body: JSON.stringify(enroll)
+    });
+    if(!res.ok) return null;
+    const data = await res.json();
+    return data[0] || null;
+  } catch(e) { return null; }
+}
+
+// 이력 수정
+async function updateEnrollment(id, fields) {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/enrollments?id=eq.' + id, {
+      method: 'PATCH', headers: DB_HEADERS, body: JSON.stringify(fields)
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+
+// 이력 삭제
+async function deleteEnrollment(id) {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/enrollments?id=eq.' + id, {
+      method: 'DELETE', headers: DB_HEADERS
     });
     return res.ok;
   } catch(e) { return false; }
@@ -1561,14 +1672,24 @@ function toast(msg,ms=3000){
   el.className='toast-item';el.textContent=msg;w.appendChild(el);
   setTimeout(()=>el.remove(),ms);
 }
-function openM(id){if(id==='notify')renderNotify();document.getElementById('modal-'+id).classList.add('on')}
+function openM(id){
+  if(id==='notify') renderNotify();
+  if(id==='addEnroll'){
+    const sel = document.getElementById('en-member');
+    if(sel) sel.innerHTML = members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+    // 저장 버튼 초기화
+    const btn = document.querySelector('#modal-addEnroll .bp');
+    if(btn){ btn.textContent='등록'; btn.onclick=addEnrollment; }
+  }
+  document.getElementById('modal-'+id).classList.add('on');
+}
 function closeM(id){document.getElementById('modal-'+id).classList.remove('on')}
 document.querySelectorAll('.mbg').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('on')}));
 
 // ═══════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════
-const pgTitles={dash:'홈 대시보드',gsync:'구글 시트 연동',members:'회원 관리',expire:'만료 임박',attend:'출석 체크',schedule:'수업 스케줄',kakao:'카카오 발송',auto:'자동화 설정',payment:'수강료 정산',analytics:'매출 분석'};
+const pgTitles={dash:'홈 대시보드',gsync:'구글 시트 연동',history:'수강 이력',members:'회원 관리',expire:'만료 임박',attend:'출석 체크',schedule:'수업 스케줄',kakao:'카카오 발송',auto:'자동화 설정',payment:'수강료 정산',analytics:'매출 분석'};
 const pgInits={
   dash:renderDash, members:()=>{memPage=1;renderMemTable()}, gsync:renderGSync,
   expire:renderExpire, attend:()=>{renderAttSelect();renderCal();renderAttList()},
@@ -2476,6 +2597,253 @@ function syncFromPaste(){
   var mode = modeEl ? modeEl.value : 'merge';
   applyMembers(newList, mode);
 }
+// ═══════════════════════════════════════════
+//  RENDER: HISTORY (수강 이력)
+// ═══════════════════════════════════════════
+
+// 이력 로컬 캐시
+let enrollmentsCache = [];
+let histPage = 1;
+const HIST_PAGE_SIZE = 20;
+
+async function renderHistory() {
+  // DB에서 이력 불러오기
+  const all = await loadAllEnrollments();
+  enrollmentsCache = all;
+
+  // 회원 필터 셀렉트 업데이트
+  const sel = document.getElementById('histFilterMember');
+  const cur = sel ? sel.value : '';
+  if(sel) {
+    const names = [...new Set(all.map(e=>e.member_name))].sort();
+    sel.innerHTML = '<option value="">전체 회원</option>' +
+      names.map(n=>`<option value="${n}" ${cur===n?'selected':''}>${n}</option>`).join('');
+  }
+
+  // 필터 적용
+  const filtered = cur ? all.filter(e=>e.member_name===cur) : all;
+
+  // 통계
+  renderHistStats(all, filtered, cur);
+
+  // 테이블
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total/HIST_PAGE_SIZE));
+  histPage = Math.min(histPage, pages);
+  const slice = filtered.slice((histPage-1)*HIST_PAGE_SIZE, histPage*HIST_PAGE_SIZE);
+
+  const tbody = document.getElementById('histTbody');
+  if(tbody) tbody.innerHTML = slice.length ? slice.map(e => `<tr>
+    <td>
+      <span style="font-weight:500;cursor:pointer;color:var(--gold);text-decoration:underline;text-underline-offset:2px"
+        onclick="showTimeline('${e.member_name}')">${e.member_name}</span>
+    </td>
+    <td><span class="pill pg">${e.round}기</span></td>
+    <td><span class="tag ${tagCls[e.cls]||'t-ki'}" style="font-size:10px">${e.cls||'—'}</span></td>
+    <td style="font-size:11.5px;color:var(--muted)">${e.ticket||'—'}</td>
+    <td style="font-size:11.5px">${e.start_date||'—'}</td>
+    <td style="font-size:11.5px">${e.expire_date||'—'}</td>
+    <td style="font-weight:500">${e.amount?e.amount.toLocaleString()+'원':'—'}</td>
+    <td>${e.paid?'<span class="pill pg">완납</span>':'<span class="pill pr">미납</span>'}</td>
+    <td style="font-size:11.5px">${e.pay_method||'—'}</td>
+    <td style="font-size:11.5px">${e.att_rate!=null?e.att_rate+'%':'—'}</td>
+    <td style="font-size:11px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.memo||''}">${e.discount?'<span class="pill pw" style="font-size:8.5px">'+e.discount+'</span> ':''} ${e.memo||'—'}</td>
+    <td style="font-size:10.5px;color:var(--muted)">${e.created_at?e.created_at.slice(0,10):'—'}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn bo bs" onclick="editEnrollment(${e.id})">✏️</button>
+      <button class="btn bo bs" style="color:var(--red)" onclick="removeEnrollment(${e.id})">🗑</button>
+    </div></td>
+  </tr>`).join('')
+  : '<tr><td colspan="13" style="text-align:center;padding:30px;color:var(--muted)">등록된 이력이 없어요 — 재등록 기록 버튼으로 추가하세요</td></tr>';
+
+  renderPager('histPager', histPage, pages, total, (p)=>{histPage=p;renderHistory()});
+}
+
+function renderHistStats(all, filtered, memberName) {
+  const statsEl = document.getElementById('histStats');
+  if(!statsEl) return;
+  const totalReg = filtered.length;
+  const totalAmt = filtered.reduce((s,e)=>s+(e.amount||0),0);
+  const avgAtt   = filtered.filter(e=>e.att_rate!=null).length
+    ? Math.round(filtered.filter(e=>e.att_rate!=null).reduce((s,e)=>s+e.att_rate,0)/filtered.filter(e=>e.att_rate!=null).length) : 0;
+  const maxRound = filtered.length ? Math.max(...filtered.map(e=>e.round||1)) : 0;
+
+  statsEl.innerHTML = `
+    <div class="stat-tile st-gold"><div class="sl">${memberName?memberName+' 총':'전체'} 등록 건수</div>
+      <div class="sv">${totalReg}<span>건</span></div></div>
+    <div class="stat-tile st-rose"><div class="sl">누적 수강료</div>
+      <div class="sv">${totalAmt>=10000?(totalAmt/10000).toFixed(1)+'<span>만원</span>':totalAmt+'<span>원</span>'}</div></div>
+    <div class="stat-tile st-sage"><div class="sl">평균 출석률</div>
+      <div class="sv">${avgAtt||'—'}<span>${avgAtt?'%':''}</span></div></div>
+    <div class="stat-tile st-sky"><div class="sl">최고 차수</div>
+      <div class="sv">${maxRound||'—'}<span>${maxRound?'기':''}</span></div></div>`;
+}
+
+async function showTimeline(memberName) {
+  const timeline = document.getElementById('histTimeline');
+  const title    = document.getElementById('histTimelineTitle');
+  const body     = document.getElementById('histTimelineBody');
+  if(!timeline||!title||!body) return;
+
+  const records = enrollmentsCache.filter(e=>e.member_name===memberName)
+    .sort((a,b)=>a.round-b.round);
+
+  title.textContent = memberName + ' · 수강 타임라인';
+  timeline.style.display = 'block';
+  timeline.scrollIntoView({behavior:'smooth'});
+
+  if(!records.length) {
+    body.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted)">이력이 없어요</div>';
+    return;
+  }
+
+  body.innerHTML = `
+    <div style="position:relative;padding-left:28px">
+      <div style="position:absolute;left:10px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--gold),var(--rose))"></div>
+      ${records.map((e,i) => `
+        <div style="position:relative;margin-bottom:20px">
+          <div style="position:absolute;left:-24px;width:14px;height:14px;border-radius:50%;
+            background:${i===0?'var(--gold)':'var(--rose)'};border:2px solid var(--surf);
+            box-shadow:0 0 0 2px ${i===0?'var(--gold)':'var(--rose)'}"></div>
+          <div class="card" style="box-shadow:none">
+            <div class="ch" style="padding:11px 16px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="pill ${i===0?'pg':'pb'}" style="font-family:'Cormorant Garamond',serif;font-size:11px">${e.round}기</span>
+                <span style="font-weight:500;font-size:13px">${e.cls||'—'}</span>
+                <span style="font-size:11.5px;color:var(--muted)">${e.ticket||''}</span>
+              </div>
+              <span style="font-size:11px;color:var(--muted)">${e.start_date||'?'} ~ ${e.expire_date||'?'}</span>
+            </div>
+            <div class="cb" style="padding:10px 16px">
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+                ${[
+                  ['금액', e.amount?e.amount.toLocaleString()+'원':'—'],
+                  ['납부', e.paid?'<span class="pill pg">완납</span>':'<span class="pill pr">미납</span>'],
+                  ['결제방법', e.pay_method||'—'],
+                  ['출석률', e.att_rate!=null?`<span style="color:var(--rose);font-weight:500">${e.att_rate}%</span>`:'—'],
+                ].map(([l,v])=>`<div style="background:var(--surf2);border-radius:var(--r);padding:8px 10px">
+                  <div class="fl" style="margin-bottom:2px">${l}</div>
+                  <div style="font-size:12px">${v}</div>
+                </div>`).join('')}
+              </div>
+              ${e.discount?`<div style="margin-top:8px;font-size:11px;color:var(--warn)">🎁 ${e.discount}</div>`:''}
+              ${e.memo?`<div style="margin-top:6px;font-size:11.5px;color:var(--muted);font-style:italic">"${e.memo}"</div>`:''}
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+async function addEnrollment() {
+  const memberSel = document.getElementById('en-member');
+  const memberName = memberSel ? memberSel.options[memberSel.selectedIndex].text : '';
+  const memberId   = memberSel ? parseInt(memberSel.value) : 0;
+  if(!memberName || !memberId) { toast('⚠ 회원을 선택해주세요'); return; }
+
+  const enroll = {
+    member_id:   memberId,
+    member_name: memberName,
+    round:       parseInt(document.getElementById('en-round').value) || 1,
+    cls:         document.getElementById('en-cls').value,
+    ticket:      document.getElementById('en-ticket').value,
+    start_date:  document.getElementById('en-start').value || null,
+    expire_date: document.getElementById('en-expire').value || null,
+    amount:      parseInt(document.getElementById('en-amount').value) || 0,
+    paid:        document.getElementById('en-paid').value === 'true',
+    pay_method:  document.getElementById('en-paymethod').value,
+    discount:    document.getElementById('en-discount').value.trim(),
+    att_rate:    document.getElementById('en-attrate').value ? parseInt(document.getElementById('en-attrate').value) : null,
+    memo:        document.getElementById('en-memo').value.trim(),
+  };
+
+  const saved = await saveEnrollment(enroll);
+  if(saved) {
+    closeM('addEnroll');
+    toast('✅ ' + memberName + ' ' + enroll.round + '기 이력 등록 완료!');
+    renderHistory();
+    // 회원 만료일도 업데이트
+    if(enroll.expire_date) {
+      const m = members.find(x=>x.id===memberId);
+      if(m) {
+        m.expire = enroll.expire_date;
+        m.ticket = enroll.ticket;
+        m.cls    = enroll.cls;
+        m.paid   = enroll.paid;
+        await updateMemberInDB(memberId, { expire: enroll.expire_date, ticket: enroll.ticket, cls: enroll.cls, paid: enroll.paid });
+        renderDash();
+      }
+    }
+  } else {
+    toast('⚠ 저장 실패 — 인터넷 연결 확인');
+  }
+}
+
+async function removeEnrollment(id) {
+  if(!confirm('이 이력을 삭제하시겠어요?')) return;
+  const ok = await deleteEnrollment(id);
+  if(ok) { toast('🗑 이력 삭제 완료'); renderHistory(); }
+  else toast('⚠ 삭제 실패');
+}
+
+function editEnrollment(id) {
+  const e = enrollmentsCache.find(x=>x.id===id);
+  if(!e) return;
+  // 모달 열고 값 채우기
+  const memberSel = document.getElementById('en-member');
+  if(memberSel) memberSel.value = e.member_id;
+  document.getElementById('en-round').value     = e.round || 1;
+  document.getElementById('en-cls').value       = e.cls || '';
+  document.getElementById('en-ticket').value    = e.ticket || '';
+  document.getElementById('en-start').value     = e.start_date || '';
+  document.getElementById('en-expire').value    = e.expire_date || '';
+  document.getElementById('en-amount').value    = e.amount || '';
+  document.getElementById('en-paid').value      = e.paid ? 'true' : 'false';
+  document.getElementById('en-paymethod').value = e.pay_method || '계좌이체';
+  document.getElementById('en-discount').value  = e.discount || '';
+  document.getElementById('en-attrate').value   = e.att_rate || '';
+  document.getElementById('en-memo').value      = e.memo || '';
+  // 저장 버튼을 수정으로
+  const saveBtn = document.querySelector('#modal-addEnroll .bp');
+  if(saveBtn) {
+    saveBtn.textContent = '수정 저장';
+    saveBtn.onclick = async () => {
+      const fields = {
+        round:       parseInt(document.getElementById('en-round').value)||1,
+        cls:         document.getElementById('en-cls').value,
+        ticket:      document.getElementById('en-ticket').value,
+        start_date:  document.getElementById('en-start').value||null,
+        expire_date: document.getElementById('en-expire').value||null,
+        amount:      parseInt(document.getElementById('en-amount').value)||0,
+        paid:        document.getElementById('en-paid').value==='true',
+        pay_method:  document.getElementById('en-paymethod').value,
+        discount:    document.getElementById('en-discount').value.trim(),
+        att_rate:    document.getElementById('en-attrate').value?parseInt(document.getElementById('en-attrate').value):null,
+        memo:        document.getElementById('en-memo').value.trim(),
+      };
+      const ok = await updateEnrollment(id, fields);
+      if(ok){ closeM('addEnroll'); toast('✅ 이력 수정 완료!'); renderHistory(); }
+      else toast('⚠ 수정 실패');
+      saveBtn.textContent='등록'; saveBtn.onclick=addEnrollment;
+    };
+  }
+  openM('addEnroll');
+}
+
+function exportHistoryCSV() {
+  const header = '회원명,차수,수업반,수강권,시작일,만료일,금액,납부,결제방법,출석률,할인,메모,등록일시';
+  const dataRows = enrollmentsCache.map(e=>
+    [e.member_name,e.round+'기',e.cls||'',e.ticket||'',e.start_date||'',e.expire_date||'',
+     e.amount||0,e.paid?'완납':'미납',e.pay_method||'',e.att_rate!=null?e.att_rate+'%':'',
+     e.discount||'',e.memo||'',e.created_at?e.created_at.slice(0,10):''].join(',')
+  );
+  const rows = [header, ...dataRows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿'+rows],{type:'text/csv;charset=utf-8'}));
+  a.download = 'Mary_in_Ballet_수강이력.csv';
+  a.click();
+  toast('📥 수강 이력 CSV 다운로드!');
+}
+
 // ═══════════════════════════════════════════
 //  RENDER: AUTO
 // ═══════════════════════════════════════════
