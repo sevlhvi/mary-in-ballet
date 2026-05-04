@@ -1559,7 +1559,10 @@ const tagCls = {
 const dotCls = {active:'d-on',expire:'d-warn',pause:'d-off'};
 const stLbl  = {active:'활성',expire:'만료임박',pause:'일시정지'};
 
-let members = [
+// 회원 데이터 — DB 로드 또는 구글 시트 동기화로 채워짐
+let members = [];
+// 초기 샘플 데이터 (DB 연결 안 될 때 fallback)
+const SAMPLE_MEMBERS = [
   {id:1, name:'김해나', phone:'010-8945-6389', grade:'초등학교 1학년', cls:'초등발레 L0.5', ticket:'1레벨 주2회(4주)', amount:162000, days:'월/수 13:10', expire:'2026-05-12', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[0], avaFg:avaFg[0]},
   {id:2, name:'박나현', phone:'010-9482-0807', grade:'초등학교 1학년', cls:'초등발레 L0.5', ticket:'1레벨 주3회(4주)', amount:234000, days:'월/수/금 13:10', expire:'2026-05-12', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[1], avaFg:avaFg[1]},
   {id:3, name:'박소유', phone:'010-2960-4003', grade:'초등학교 2학년', cls:'초등발레+현대무용', ticket:'1레벨 주2회(4주)', amount:162000, days:'월14:00/수13:10', expire:'2026-05-12', paid:true, status:'active', src:'구글시트', memo:'오픈 이벤트 10% 할인', attRate:100, avaBg:avaBg[2], avaFg:avaFg[2]},
@@ -1590,6 +1593,13 @@ let members = [
   {id:28, name:'고다은', phone:'010-9636-3080', grade:'—', cls:'초등발레 L0.5', ticket:'1레벨 주2회(4주)', amount:0, days:'—', expire:'—', paid:false, status:'active', src:'구글시트', memo:'', attRate:100, avaBg:avaBg[3], avaFg:avaFg[3]},
   {id:29, name:'박영은', phone:'010-2575-3712', grade:'—', cls:'—', ticket:'—', amount:0, days:'—', expire:'—', paid:false, status:'active', src:'구글시트', memo:'', attRate:100, avaBg:avaBg[4], avaFg:avaFg[4]}
 ];
+
+// DB 로드 실패 시 샘플 데이터 사용
+function useSampleMembers() {
+  if(members.length === 0) {
+    members = SAMPLE_MEMBERS.map(m => Object.assign({}, m));
+  }
+}
 
 // ── 수업 데이터 ─────────────────────────────────────────────
 const classData = [
@@ -2364,7 +2374,21 @@ function mapRow(rowObj) {
   // 시작일 변환
   if(mapped.startDate) mapped.startDate = parseStartDate(mapped.startDate);
 
+  // 학년 정규화
+  if(mapped.grade) mapped.grade = normalizeGrade(mapped.grade);
+
   return mapped;
+}
+
+// 학년 정규화 — 구글 시트 형식 그대로 유지
+// 시트: "초등학교 O학년" / "O세" 로 통일됨
+function normalizeGrade(val) {
+  if(!val || val === '—') return '—';
+  var s = val.toString().trim();
+  if(s === '' || s === 'NaN' || s === 'nan') return '—';
+  // "N살" → "N세" (시트에 혹시 살로 입력된 경우만 변환)
+  s = s.replace(/(\d+)살$/, '$1세');
+  return s;
 }
 
 
@@ -2517,9 +2541,20 @@ function applyMembers(memberList, mode){
     : '동기화 완료! '+updatedCnt+'명 업데이트 · '+addedCnt+'명 신규 추가';
   showSyncStatus(msg, 'success');
   toast('🔄 구글 시트 동기화 중... DB에 저장하고 있어요');
-  syncMembersToDB(members).then(ok => {
-    if(ok) toast('✅ DB 저장 완료! 총 '+members.length+'명');
-    else toast('⚠ DB 저장 실패 — 인터넷 연결 확인해주세요');
+  syncMembersToDB(members).then(async function(ok) {
+    if(ok) {
+      toast('✅ DB 저장 완료! 총 '+members.length+'명 — 선생님과 공유됩니다');
+      // DB에서 다시 불러와 ID 등 최신 정보 반영
+      var loaded = await loadMembersFromDB();
+      if(loaded) {
+        renderDash();
+        renderMemTable();
+        renderAttSelect();
+        updateChipCounts();
+      }
+    } else {
+      toast('⚠ DB 저장 실패 — 인터넷 연결 확인해주세요');
+    }
   });
 }
 
@@ -3312,6 +3347,8 @@ async function init() {
   const loaded = await loadMembersFromDB();
   if(loaded) {
     toast('✅ DB에서 ' + members.length + '명 불러왔어요!');
+  } else {
+    useSampleMembers();
   }
   renderDash();
   renderAttSelect();
