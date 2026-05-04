@@ -821,12 +821,10 @@ body{
             <div style="display:flex;gap:6px;align-items:center">
               <button class="btn bo bs" onclick="changeAttMonth(-1)">◀</button>
               <select class="fi bs" id="attYear" style="width:72px" onchange="renderCal()">
-                <option value="2025">2025</option>
-                <option value="2026" selected>2026</option>
               </select>
               <select class="fi bs" id="attMonth" style="width:60px" onchange="renderCal()">
                 <option value="1">1월</option><option value="2">2월</option>
-                <option value="3" selected>3월</option><option value="4">4월</option>
+                <option value="3">3월</option><option value="4">4월</option>
                 <option value="5">5월</option><option value="6">6월</option>
                 <option value="7">7월</option><option value="8">8월</option>
                 <option value="9">9월</option><option value="10">10월</option>
@@ -1916,6 +1914,24 @@ function renderExpire(){
 function renderAttSelect(){
   document.getElementById('attSel').innerHTML=members.map(m=>`<option value="${m.id}">${m.name} (${m.cls})</option>`).join('');
   document.getElementById('payMem').innerHTML=members.map(m=>`<option>${m.name}</option>`).join('');
+  // 연도 select 현재 연도 기준 동적 생성
+  const yearEl = document.getElementById('attYear');
+  if(yearEl && !yearEl.options.length){
+    const now = new Date();
+    const cy = now.getFullYear();
+    for(let y=cy-1; y<=cy+1; y++){
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      if(y===cy) opt.selected = true;
+      yearEl.appendChild(opt);
+    }
+  }
+  // 월 select 현재 월로 초기화
+  const monthEl = document.getElementById('attMonth');
+  if(monthEl){
+    const now = new Date();
+    monthEl.value = now.getMonth()+1;
+  }
 }
 // 출석 데이터 저장소 (회원ID → {년월 → {날짜: 'attend'|'absent'}})
 const attData = {};
@@ -2429,6 +2445,27 @@ function renderGASPreview(rows){
   }).join('')+(rows.length>6?'<tr><td colspan="'+headers.length+'" style="text-align:center;color:var(--muted);font-size:11px;padding:8px">... 외 '+(rows.length-6)+'명</td></tr>':'');
 }
 
+// 구글 시트 row → enrollment 변환
+function rowToEnrollment(rawRow, member) {
+  var m = mapRow(rawRow);
+  var round = parseInt(rawRow['차수'] || rawRow['등록차수'] || '1') || 1;
+  return {
+    member_id:   member ? member.id : null,
+    member_name: m.name || (member ? member.name : ''),
+    round:       round,
+    cls:         m.cls || buildCls(rawRow),
+    ticket:      m.ticket || '—',
+    start_date:  m.startDate || null,
+    expire_date: m.expire !== '—' ? m.expire : null,
+    amount:      m.amount || 0,
+    paid:        m.paid !== undefined ? m.paid : false,
+    pay_method:  rawRow['결제방법'] || rawRow['납부방법'] || null,
+    discount:    rawRow['할인'] || (m.memo && m.memo.includes('10%') ? '오픈 이벤트 10%' : null),
+    att_rate:    rawRow['출석률'] ? parseInt(rawRow['출석률']) : null,
+    memo:        m.memo || null,
+  };
+}
+
 function applyMembers(memberList, mode){
   var avaBgL = ['#f5ddd5','#d5e8f5','#d5f0de','#f5ebd5','#e8d5f5','#d5eeee'];
   var avaFgL = ['#8c3020','#204878','#3a7040','#8c5018','#582a8c','#2a6060'];
@@ -2480,9 +2517,8 @@ function applyMembers(memberList, mode){
     : '동기화 완료! '+updatedCnt+'명 업데이트 · '+addedCnt+'명 신규 추가';
   showSyncStatus(msg, 'success');
   toast('🔄 구글 시트 동기화 중... DB에 저장하고 있어요');
-  // Supabase DB에도 동기화
   syncMembersToDB(members).then(ok => {
-    if(ok) toast('✅ DB 저장 완료! 총 '+members.length+'명 — 선생님과 실시간 공유됩니다');
+    if(ok) toast('✅ DB 저장 완료! 총 '+members.length+'명');
     else toast('⚠ DB 저장 실패 — 인터넷 연결 확인해주세요');
   });
 }
@@ -2592,6 +2628,26 @@ function syncFromPaste(){
   }
 
   renderGASPreview(json.members);
+
+  // 수강 이력 자동 생성 (시트에 차수 컬럼 있으면 저장)
+  var hasRound = json.members.length && ('차수' in json.members[0] || '등록차수' in json.members[0]);
+  if(hasRound){
+    var enrollsToSave = [];
+    json.members.forEach(function(rawRow){
+      var m = mapRow(rawRow);
+      if(!m.name) return;
+      var member = members.find(function(x){ return x.name === m.name; });
+      var enroll = rowToEnrollment(rawRow, member);
+      if(enroll.member_name) enrollsToSave.push(enroll);
+    });
+    if(enrollsToSave.length){
+      Promise.all(enrollsToSave.map(function(e){ return saveEnrollment(e); }))
+        .then(function(results){
+          var saved = results.filter(Boolean).length;
+          toast('📋 수강 이력 '+saved+'건 DB 저장 완료!');
+        });
+    }
+  }
 
   var modeEl = document.querySelector('input[name="syncMode"]:checked');
   var mode = modeEl ? modeEl.value : 'merge';
