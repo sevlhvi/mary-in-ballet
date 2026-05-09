@@ -2299,31 +2299,49 @@ function parsePaid(val) {
   return false;
 }
 
-// 만료일 파싱 (다양한 형식 처리)
+// 만료일/시작일 파싱 — 모든 형식 처리
 function parseExpire(val) {
   if(!val) return '—';
   var s = val.toString().trim();
-  if(!s || s === '—' || s === '-') return '—';
+  if(!s || s === '—' || s === '-' || s === 'NaN' || s === 'undefined') return '—';
 
-  // "Tue May 12 2026 16:00:00 GMT+0900" 형식
-  if(s.indexOf('GMT') !== -1) {
+  // "Wed Apr 29 2026 16:00:00 GMT+0900 (Korean Standard Time)" 형식
+  // "Tue May 12 2026 ..." 형식
+  if(s.indexOf('GMT') !== -1 || s.indexOf('Standard Time') !== -1 ||
+     /^[A-Z][a-z]{2}\s[A-Z][a-z]{2}\s\d/.test(s)) {
     var d = new Date(s);
-    if(!isNaN(d)) {
+    if(!isNaN(d.getTime())) {
       return d.getFullYear() + '-' +
         String(d.getMonth()+1).padStart(2,'0') + '-' +
         String(d.getDate()).padStart(2,'0');
     }
   }
   // "2026-05-12" 형식 → 그대로
-  if(s.match(/^\d{4}-\d{2}-\d{2}$/)) return s;
-  // "5/12" 또는 "05/12" 형식 → 2026년으로 처리
-  var m = s.match(/^(\d{1,2})\/(\d{1,2})$/);
-  if(m) return '2026-' + String(m[1]).padStart(2,'0') + '-' + String(m[2]).padStart(2,'0');
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // "5/12" 또는 "05/12" 형식
+  var m1 = s.match(/^(\d{1,2})\/(\d{1,2})$/);
+  if(m1) return '2026-' + String(m1[1]).padStart(2,'0') + '-' + String(m1[2]).padStart(2,'0');
   // "2026.05.12" 형식
   var m2 = s.match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
   if(m2) return m2[1] + '-' + m2[2] + '-' + m2[3];
-
-  return s;
+  // 엑셀 날짜 숫자 (예: 46125)
+  if(/^\d{5}$/.test(s)) {
+    var d2 = new Date(1899, 11, 30);
+    d2.setDate(d2.getDate() + parseInt(s));
+    return d2.getFullYear() + '-' +
+      String(d2.getMonth()+1).padStart(2,'0') + '-' +
+      String(d2.getDate()).padStart(2,'0');
+  }
+  // Date 객체가 숫자로 변환된 경우 (타임스탬프)
+  if(/^\d{13}$/.test(s)) {
+    var d3 = new Date(parseInt(s));
+    if(!isNaN(d3.getTime())) {
+      return d3.getFullYear() + '-' +
+        String(d3.getMonth()+1).padStart(2,'0') + '-' +
+        String(d3.getDate()).padStart(2,'0');
+    }
+  }
+  return '—';
 }
 
 // 금액 파싱 (쉼표, 원 제거)
@@ -2337,9 +2355,29 @@ function parseAmount(val) {
 function parseStartDate(val) {
   if(!val) return '';
   var s = val.toString().trim();
+  if(!s || s === '—' || s === 'NaN') return '';
+  // GMT 형식
+  if(s.indexOf('GMT') !== -1 || /^[A-Z][a-z]{2}\s[A-Z][a-z]{2}\s\d/.test(s)) {
+    var d = new Date(s);
+    if(!isNaN(d.getTime())) {
+      return d.getFullYear() + '-' +
+        String(d.getMonth()+1).padStart(2,'0') + '-' +
+        String(d.getDate()).padStart(2,'0');
+    }
+  }
+  // "2026-04-14" 형식
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
   // "4/14(화)" → "2026-04-14"
   var m = s.match(/^(\d{1,2})\/(\d{1,2})/);
   if(m) return '2026-' + String(m[1]).padStart(2,'0') + '-' + String(m[2]).padStart(2,'0');
+  // 엑셀 날짜 숫자
+  if(/^\d{5}$/.test(s)) {
+    var d2 = new Date(1899, 11, 30);
+    d2.setDate(d2.getDate() + parseInt(s));
+    return d2.getFullYear() + '-' +
+      String(d2.getMonth()+1).padStart(2,'0') + '-' +
+      String(d2.getDate()).padStart(2,'0');
+  }
   return s;
 }
 
