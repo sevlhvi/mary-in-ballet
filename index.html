@@ -1423,15 +1423,24 @@ async function loadAllEnrollments() {
 // 이력 저장
 async function saveEnrollment(enroll) {
   try {
+    // UPSERT: member_name + round 중복이면 UPDATE, 없으면 INSERT
     const res = await fetch(SUPABASE_URL + '/rest/v1/enrollments', {
       method: 'POST',
-      headers: { ...DB_HEADERS, 'Prefer': 'return=representation' },
+      headers: { 
+        ...DB_HEADERS, 
+        'Prefer': 'return=representation,resolution=merge-duplicates',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(enroll)
     });
-    if(!res.ok) return null;
+    if(!res.ok) {
+      const err = await res.text().catch(()=>'');
+      console.warn('[saveEnrollment] 실패:', res.status, err);
+      return null;
+    }
     const data = await res.json();
     return data[0] || null;
-  } catch(e) { return null; }
+  } catch(e) { console.error('[saveEnrollment] 예외:', e); return null; }
 }
 
 // 이력 수정
