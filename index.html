@@ -2720,21 +2720,29 @@ function syncFromPaste(){
   // 수강 이력 자동 생성 (시트에 차수 컬럼 있으면 저장)
   // 차수/등록차수 컬럼 존재 여부 확인
   var firstRow = json.members[0] || {};
-  var hasRound = ('차수' in firstRow && firstRow['차수']) || 
-                 ('등록차수' in firstRow && firstRow['등록차수']) || 
-                 ('등록 차수' in firstRow && firstRow['등록 차수']);
+  // 컬럼명 존재 여부만 체크 (값이 비어도 저장 시도)
+  var hasRound = '차수' in firstRow || '등록차수' in firstRow || '등록 차수' in firstRow;
+  // hasRound 없어도, 시작일/수강권 있으면 무조건 저장 시도
+  if(!hasRound) {
+    var hasCoreData = '시작일' in firstRow || '수강권' in firstRow || '금액' in firstRow;
+    hasRound = hasCoreData;
+  }
   if(hasRound){
     var enrollsToSave = [];
     json.members.forEach(function(rawRow){
       var m = mapRow(rawRow);
-      if(!m.name) return;
+      if(!m.name) { console.log('[enrollment] 이름 없음, skip:', rawRow); return; }
       var member = members.find(function(x){ return x.name === m.name; });
       var enroll = rowToEnrollment(rawRow, member);
+      console.log('[enrollment] row→enroll:', m.name, enroll);
       if(enroll.member_name) enrollsToSave.push(enroll);
+      else console.log('[enrollment] member_name 없음 skip');
     });
+    console.log('[enrollment] enrollsToSave 총:', enrollsToSave.length, '건');
     if(enrollsToSave.length){
       // 기존 이력 전체 조회 후 중복이면 skip, 신규면 저장
       loadAllEnrollments().then(function(existing){
+        console.log('[enrollment] 기존 DB 이력:', existing.length, '건');
         var toSave = enrollsToSave.filter(function(e){
           // 같은 member_name + round 가 없을 때만 저장
           return !existing.some(function(ex){
@@ -2745,10 +2753,14 @@ function syncFromPaste(){
           toast('📋 수강 이력 — 이미 최신 상태예요');
           return;
         }
+        console.log('[enrollment] 저장 시도:', toSave.length, '건', toSave);
         Promise.all(toSave.map(function(e){ return saveEnrollment(e); }))
           .then(function(results){
             var saved = results.filter(Boolean).length;
-            toast('📋 수강 이력 '+saved+'건 새로 저장 완료!');
+            var failed = results.filter(function(r){ return !r; }).length;
+            console.log('[enrollment] 저장 완료:', saved, '건 / 실패:', failed, '건');
+            if(failed > 0) toast('⚠ 수강 이력 '+failed+'건 저장 실패 — 콘솔 확인');
+            else toast('📋 수강 이력 '+saved+'건 새로 저장 완료!');
           });
       });
     }
