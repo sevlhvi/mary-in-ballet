@@ -2506,7 +2506,8 @@ function rowToEnrollment(rawRow, member) {
   var m = mapRow(rawRow);
   // 등록차수 파싱
   var roundRaw = rawRow['등록차수'] || rawRow['차수'] || rawRow['등록 차수'] || m.round || '1';
-  var round = parseInt(String(roundRaw).replace(/[^0-9]/g,'')) || 1;
+  var roundStr = String(roundRaw).replace(/[^0-9]/g,'');
+  var round = roundStr ? parseInt(roundStr) : 1;
 
   // 재등록일 파싱 (만료일 없으면 재등록일 사용)
   var reRegDate = rawRow['재등록일'] || '';
@@ -2719,7 +2720,9 @@ function syncFromPaste(){
   // 수강 이력 자동 생성 (시트에 차수 컬럼 있으면 저장)
   // 차수/등록차수 컬럼 존재 여부 확인
   var firstRow = json.members[0] || {};
-  var hasRound = '차수' in firstRow || '등록차수' in firstRow || '등록 차수' in firstRow;
+  var hasRound = ('차수' in firstRow && firstRow['차수']) || 
+                 ('등록차수' in firstRow && firstRow['등록차수']) || 
+                 ('등록 차수' in firstRow && firstRow['등록 차수']);
   if(hasRound){
     var enrollsToSave = [];
     json.members.forEach(function(rawRow){
