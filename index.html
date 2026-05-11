@@ -2533,15 +2533,19 @@ function rowToEnrollment(rawRow, member) {
     discount = '오픈 이벤트 10%';
   }
 
+  // member_id는 보내지 않음 — members 테이블 ID 불일치 방지
+  // member_name + round unique constraint로 식별
   return {
-    member_id:   member ? member.id : null,
     member_name: m.name || (member ? member.name : ''),
     round:       round,
     cls:         m.cls || buildCls(rawRow),
     ticket:      m.ticket || '—',
     start_date:  m.startDate || null,
     expire_date: expireDate,
-    amount:      m.amount || 0,
+    amount:      (function(){
+      var a = parseInt(String(m.amount).replace(/[^0-9]/g,'')) || 0;
+      return a > 10000000 ? 0 : a; // 비정상 큰 값(날짜 시리얼 등) 방어
+    })(),
     paid:        m.paid !== undefined ? m.paid : false,
     pay_method:  payMethod,
     discount:    discount,
